@@ -1,0 +1,42 @@
+{% extends relative_dir ~ '/base.html' %}
+{% block body %}
+    <div id='container'>
+        <div id='wrapper'>
+            <div id='header'>
+                <div id='icon'>
+                    <img src='{{ dir }}/feed.png' />
+                </div>
+                <div id='close'>
+                    <a href='{{ COMMAND_CLOSE }}'><img src='{{ dir }}/cross.png' /></a>
+                </div>
+                <div id='feed'>
+                    <div id='feed-title'>
+                        <a href='{{ feed.link }}'>{{ feed.title }}</a>
+                    </div>
+                    <div id='item-author'>
+                        {{ item.time_since }} ago{% if item.author %} by {{ item.author }}{% endif %}
+                    </div>
+                </div>
+            </div>
+            <div id='body'>
+                <div id='item-title'>
+                    <a href='{{ item.link }}'>{{ item.title }}</a>
+                </div>
+                <div id='item-description'>
+                    {{ item.description }}
+                </div>
+            </div>
+            <div id='footer'>
+                <div id='controls'>
+                    <a href='{{ COMMAND_PLAY }}'><img src='{{ dir }}/control_play.png' /></a>
+                    <a href='{{ COMMAND_PAUSE }}'><img src='{{ dir }}/control_pause.png' /></a>
+                </div>
+                <a href='{{ COMMAND_FIRST }}'><img src='{{ dir }}/control_start.png' /></a>
+                <a href='{{ COMMAND_PREVIOUS }}'><img src='{{ dir }}/control_rewind.png' /></a>
+                <span>{{ item_index }} of {{ item_count }}</span>
+                <a href='{{ COMMAND_NEXT }}'><img src='{{ dir }}/control_fastforward.png' /></a>
+                <a href='{{ COMMAND_LAST }}'><img src='{{ dir }}/control_end.png' /></a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
