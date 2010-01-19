@@ -45,12 +45,15 @@ class Controller(object):
         self.enabled = False
     def poll(self):
         try:
-            if self.enabled and idle.get_idle_duration() < 60:
-                self._poll()
+            self._poll()
         finally:
             wx.CallLater(5000, self.poll)
     def _poll(self):
         if self.polling:
+            return
+        if not self.enabled:
+            return
+        if idle.get_idle_duration() > 60:
             return
         if not self.manager.should_poll():
             return
@@ -80,16 +83,19 @@ class Controller(object):
         for feed in self.manager.feeds:
             feed.last_poll = 0
         self._poll()
-    def show_items(self, items, index):
+    def show_items(self, items, index, auto=None):
+        if not items:
+            return
         if not self.popup:
             self.popup = popups.PopupManager()
             self.popup.Bind(popups.EVT_POPUP_CLOSE, self.on_popup_close)
         self.popup.set_items(items, index)
+        if auto is not None:
+            self.popup.auto = auto
     def show_popup(self):
         items = self.manager.items
         index = len(items) - 1
-        self.show_items(items, index)
-        self.popup.auto = False
+        self.show_items(items, index, False)
     def about(self):
         window = view.AboutDialog(self.frame)
         window.CenterOnScreen()
