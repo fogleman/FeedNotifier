@@ -178,8 +178,10 @@ class PopupManager(wx.EvtHandler):
     def on_next(self):
         self.index += 1
         if self.index >= self.count:
-            self.index = self.count - 1
-        self.update()
+            #self.index = self.count - 1
+            self.on_close()
+        else:
+            self.update()
     def on_previous(self):
         self.index -= 1
         if self.index < 0:

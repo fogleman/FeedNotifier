@@ -14,5 +14,14 @@
     <body scroll='no' oncontextmenu='return false;' onselectstart='return false;'>
         {% block body %}
         {% endblock %}
+        <script type="text/javascript">
+            document.body.onclick = function(e) {
+                var target = e ? e.target : window.event.srcElement;
+                var name = target.nodeName.toLowerCase()
+                if (name != 'a' && name != 'img') {
+                    window.location.href = '{{ COMMAND_NEXT }}'
+                }
+            };
+        </script>
     </body>
 </html>
