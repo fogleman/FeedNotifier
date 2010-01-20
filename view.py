@@ -332,19 +332,24 @@ class SettingsDialog(wx.Dialog):
         line = wx.StaticLine(panel, -1)
         buttons = self.create_buttons(panel)
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(notebook, 1, wx.EXPAND|wx.ALL, 8)
+        sizer.Add(notebook, 1, wx.EXPAND|wx.ALL, 0)
         sizer.Add(line, 0, wx.EXPAND)
         sizer.Add(buttons, 0, wx.EXPAND|wx.ALL, 8)
         panel.SetSizerAndFit(sizer)
         return panel
     def create_notebook(self, parent):
-        notebook = wx.Notebook(parent, -1)
+        images = wx.ImageList(48, 32)
+        images.Add(wx.Bitmap('icons/feed32.png'))
+        images.Add(wx.Bitmap('icons/comment32.png'))
+        images.Add(wx.Bitmap('icons/cog32.png'))
+        notebook = wx.Toolbook(parent, -1, style=wx.BK_DEFAULT)
+        notebook.AssignImageList(images)
         feeds = FeedsPanel(notebook, self.controller, self.on_event)
         popups = PopupsPanel(notebook)
         options = OptionsPanel(notebook)
-        notebook.AddPage(feeds, 'Feeds')
-        notebook.AddPage(popups, 'Pop-ups')
-        notebook.AddPage(options, 'Options')
+        notebook.AddPage(feeds, 'Feeds', imageId=0)
+        notebook.AddPage(popups, 'Pop-ups', imageId=1)
+        notebook.AddPage(options, 'Options', imageId=2)
         self.feeds = feeds
         self.popups = popups
         self.options = options
