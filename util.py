@@ -35,6 +35,26 @@ def time_since(t):
         return '1 day'
     return '%d days' % days
     
+def split_time(seconds):
+    if seconds < 60:
+        return seconds, 0
+    minutes = seconds / 60
+    if minutes < 60:
+        return minutes, 1
+    hours = minutes / 60
+    days = hours / 24
+    if days and hours % 24 == 0:
+        return days, 3
+    return hours, 2
+    
+def split_time_str(seconds):
+    interval, units = split_time(seconds)
+    strings = ['second', 'minute', 'hour', 'day']
+    string = strings[units]
+    if interval != 1:
+        string += 's'
+    return '%d %s' % (interval, string)
+    
 def replace_entities1(text):
     entity = re.compile(r'&#(\d+);')
     def func(match):

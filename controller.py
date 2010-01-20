@@ -101,28 +101,16 @@ class Controller(object):
         window.CenterOnScreen()
         window.Show()
     def add_feed(self, url=''):
-        while True:
-            window = view.AddFeedDialog(self.frame, url)
-            window.CenterOnScreen()
-            result = window.ShowModal()
-            data = window.result
-            window.Destroy()
-            if result != wx.ID_OK:
-                return
-            url = data.href
-            window = view.EditFeedDialog(self.frame, data)
-            window.CenterOnScreen()
-            result = window.ShowModal()
-            feed = window.feed
-            window.Destroy()
-            if result == wx.ID_BACKWARD:
-                continue
-            if result == wx.ID_OK:
-                self._add_feed(feed)
+        feed = view.AddFeedDialog.show_wizard(self.frame, url)
+        if not feed:
             return
-    def _add_feed(self, feed):
         self.manager.feeds.append(feed)
         self._poll()
+    def edit_settings(self):
+        window = view.SettingsDialog(self.frame, self)
+        window.CenterOnScreen()
+        window.ShowModal()
+        window.Destroy()
     def close(self):
         if self.popup:
             self.popup.on_close()

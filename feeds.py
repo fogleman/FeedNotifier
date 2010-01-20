@@ -19,7 +19,7 @@ def create_id(entry):
     for key in keys:
         if key in entry:
             return str(entry[key])
-    return str(uuid.uuid4())
+    return uuid.uuid4().hex
     
 class Item(object):
     def __init__(self, feed, id):
@@ -38,6 +38,7 @@ class Item(object):
         
 class Feed(object):
     def __init__(self, url):
+        self.uuid = uuid.uuid4().hex
         self.url = url
         self.enabled = True
         self.last_poll = 0
@@ -48,6 +49,16 @@ class Feed(object):
         self.link = ''
         self.id_list = []
         self.id_set = set()
+    def make_copy(self):
+        feed = Feed(self.url)
+        for key in ['uuid', 'enabled', 'interval', 'title', 'link']:
+            value = getattr(self, key)
+            setattr(feed, key, value)
+        return feed
+    def copy_from(self, feed):
+        for key in ['enabled', 'interval', 'title', 'link']:
+            value = getattr(feed, key)
+            setattr(self, key, value)
     @property
     def favicon_url(self):
         components = urlparse.urlsplit(self.url)
@@ -58,6 +69,8 @@ class Feed(object):
             self.id_set.remove(id)
         self.id_list = self.id_list[-size:]
     def should_poll(self):
+        if not self.enabled:
+            return False
         now = int(time.time())
         duration = now - self.last_poll
         return duration >= self.interval
