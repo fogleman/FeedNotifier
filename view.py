@@ -319,12 +319,46 @@ class EditFeedDialog(wx.Dialog):
         self.EndModal(wx.ID_OK)
         
 # TODO: cleanup code below here
+class Model(object):
+    def __init__(self, controller):
+        self.controller = controller
+        self.reset()
+    def reset(self):
+        feeds = self.controller.manager.feeds
+        feeds = [feed.make_copy() for feed in feeds]
+        self.feeds = feeds
+    def apply(self):
+        self.apply_feeds()
+    def apply_feeds(self):
+        before = {}
+        after = {}
+        controller = self.controller
+        for feed in controller.manager.feeds:
+            before[feed.uuid] = feed
+        for feed in self.feeds:
+            after[feed.uuid] = feed
+        before_set = set(before.keys())
+        after_set = set(after.keys())
+        added = after_set - before_set
+        deleted = before_set - after_set
+        same = after_set & before_set
+        for uuid in added:
+            feed = after[uuid]
+            controller.manager.feeds.append(feed)
+        for uuid in deleted:
+            feed = before[uuid]
+            controller.manager.feeds.remove(feed)
+        for uuid in same:
+            a = before[uuid]
+            b = after[uuid]
+            a.copy_from(b)
+            
 class SettingsDialog(wx.Dialog):
     def __init__(self, parent, controller):
         style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
         super(SettingsDialog, self).__init__(parent, -1, 'Feed Notifier Settings', style=style)
         #self.SetIcon(wx.IconFromBitmap(wx.Bitmap('icons/feed.png')))
-        self.controller = controller
+        self.model = Model(controller)
         panel = self.create_panel(self)
         self.Fit()
     def create_panel(self, parent):
@@ -355,9 +389,6 @@ class SettingsDialog(wx.Dialog):
         notebook.AddPage(popups, 'Pop-ups', imageId=1)
         notebook.AddPage(options, 'Options', imageId=2)
         notebook.AddPage(about, 'About', imageId=3)
-        self.feeds = feeds
-        self.popups = popups
-        self.options = options
         return notebook
     def create_buttons(self, parent):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -377,8 +408,8 @@ class SettingsDialog(wx.Dialog):
         sizer.Add(apply)
         return sizer
     def apply(self):
-        self.feeds.apply()
-    def on_event(self):
+        self.model.apply()
+    def on_change(self):
         self.apply_button.Enable()
     def on_ok(self, event):
         self.apply()
@@ -392,9 +423,7 @@ class FeedsList(wx.ListCtrl):
         style = wx.LC_REPORT|wx.LC_VIRTUAL#|wx.LC_HRULES|wx.LC_VRULES
         super(FeedsList, self).__init__(parent, -1, style=style)
         self.dialog = dialog
-        feeds = self.dialog.controller.manager.feeds
-        feeds = [feed.make_copy() for feed in feeds]
-        self.feeds = feeds
+        self.model = dialog.model
         images = wx.ImageList(16, 16, True)
         self.unchecked = images.AddWithColourMask(wx.Bitmap('icons/unchecked.png'), wx.WHITE)
         self.checked = images.AddWithColourMask(wx.Bitmap('icons/checked.png'), wx.WHITE)
@@ -411,7 +440,7 @@ class FeedsList(wx.ListCtrl):
         self.Bind(wx.EVT_LEFT_DOWN, self.on_left_down)
         self.update()
     def update(self):
-        self.SetItemCount(len(self.feeds))
+        self.SetItemCount(len(self.model.feeds))
         self.Refresh()
     def on_left_down(self, event):
         index, flags = self.HitTest(event.GetPosition())
@@ -419,15 +448,15 @@ class FeedsList(wx.ListCtrl):
             self.toggle(index)
         event.Skip()
     def toggle(self, index):
-        feed = self.feeds[index]
+        feed = self.model.feeds[index]
         feed.enabled = not feed.enabled
         self.RefreshItem(index)
-        self.dialog.on_event()
+        self.dialog.on_change()
     def OnGetItemImage(self, index):
-        feed = self.feeds[index]
+        feed = self.model.feeds[index]
         return 1 if feed.enabled else 0
     def OnGetItemText(self, index, column):
-        feed = self.feeds[index]
+        feed = self.model.feeds[index]
         if column == 1:
             return util.split_time_str(feed.interval)
         if column == 2:
@@ -440,6 +469,7 @@ class FeedsPanel(wx.Panel):
     def __init__(self, parent, dialog):
         super(FeedsPanel, self).__init__(parent, -1)
         self.dialog = dialog
+        self.model = dialog.model
         panel = self.create_panel(self)
         sizer = wx.BoxSizer(wx.VERTICAL)
         line = wx.StaticLine(self, -1)
@@ -483,32 +513,9 @@ class FeedsPanel(wx.Panel):
         sizer.Add(delete)
         sizer.AddStretchSpacer(1)
         return sizer
-    def apply(self):
-        before = {}
-        after = {}
-        controller = self.dialog.controller
-        for feed in controller.manager.feeds:
-            before[feed.uuid] = feed
-        for feed in self.list.feeds:
-            after[feed.uuid] = feed
-        before_set = set(before.keys())
-        after_set = set(after.keys())
-        added = after_set - before_set
-        deleted = before_set - after_set
-        same = after_set & before_set
-        for uuid in added:
-            feed = after[uuid]
-            controller.manager.feeds.append(feed)
-        for uuid in deleted:
-            feed = before[uuid]
-            controller.manager.feeds.remove(feed)
-        for uuid in same:
-            a = before[uuid]
-            b = after[uuid]
-            a.copy_from(b)
     def update(self):
         self.list.update()
-        self.dialog.on_event()
+        self.dialog.on_change()
     def on_selection(self, event):
         event.Skip()
         count = self.list.GetSelectedItemCount()
@@ -525,7 +532,7 @@ class FeedsPanel(wx.Panel):
         if count != 1:
             return
         index = self.list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
-        feed = self.list.feeds[index]
+        feed = self.model.feeds[index]
         window = EditFeedDialog(self, feed)
         window.CenterOnScreen()
         result = window.ShowModal()
@@ -535,7 +542,7 @@ class FeedsPanel(wx.Panel):
     def on_new(self, event):
         feed = AddFeedDialog.show_wizard(self)
         if feed:
-            self.list.feeds.append(feed)
+            self.model.feeds.append(feed)
             self.update()
     def on_delete(self, event):
         feeds = []
@@ -544,11 +551,11 @@ class FeedsPanel(wx.Panel):
             index = self.list.GetNextItem(index, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
             if index < 0:
                 break
-            feed = self.list.feeds[index]
+            feed = self.model.feeds[index]
             feeds.append(feed)
         if feeds:
             for feed in feeds:
-                self.list.feeds.remove(feed)
+                self.model.feeds.remove(feed)
             self.update()
             
 class PopupsPanel(wx.Panel):
