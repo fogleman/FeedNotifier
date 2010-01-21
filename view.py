@@ -53,6 +53,7 @@ class HiddenFrame(wx.Frame):
         super(HiddenFrame, self).__init__(None, -1, 'Feed Notifier')
         self.icon = TaskBarIcon(controller)
         self.Bind(wx.EVT_CLOSE, self.on_close)
+        self.CenterOnScreen()
     def on_close(self, event):
         event.Skip()
         wx.CallAfter(self.icon.Destroy)
@@ -78,7 +79,7 @@ class AddFeedDialog(wx.Dialog):
     def show_wizard(parent, url=''):
         while True:
             window = AddFeedDialog(parent, url)
-            window.CenterOnScreen()
+            window.Center()
             result = window.ShowModal()
             data = window.result
             window.Destroy()
@@ -89,7 +90,7 @@ class AddFeedDialog(wx.Dialog):
             feed.title = data.feed.title
             feed.link = data.feed.link
             window = EditFeedDialog(parent, feed, True)
-            window.CenterOnScreen()
+            window.Center()
             result = window.ShowModal()
             window.Destroy()
             if result == wx.ID_BACKWARD:
@@ -99,7 +100,7 @@ class AddFeedDialog(wx.Dialog):
             return None
     def __init__(self, parent, initial_url=''):
         super(AddFeedDialog, self).__init__(parent, -1, 'Add RSS/Atom Feed')
-        self.SetIcon(wx.IconFromBitmap(wx.Bitmap('icons/feed.png')))
+        #self.SetIcon(wx.IconFromBitmap(wx.Bitmap('icons/feed.png')))
         self.initial_url = initial_url
         self.result = None
         panel = self.create_panel(self)
@@ -202,7 +203,7 @@ class EditFeedDialog(wx.Dialog):
     def __init__(self, parent, feed, add=False):
         title = 'Add RSS/Atom Feed' if add else 'Edit RSS/Atom Feed'
         super(EditFeedDialog, self).__init__(parent, -1, title)
-        self.SetIcon(wx.IconFromBitmap(wx.Bitmap('icons/feed.png')))
+        #self.SetIcon(wx.IconFromBitmap(wx.Bitmap('icons/feed.png')))
         self.feed = feed
         self.add = add
         panel = self.create_panel(self)
@@ -322,7 +323,7 @@ class SettingsDialog(wx.Dialog):
     def __init__(self, parent, controller):
         style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
         super(SettingsDialog, self).__init__(parent, -1, 'Feed Notifier Settings', style=style)
-        self.SetIcon(wx.IconFromBitmap(wx.Bitmap('icons/feed.png')))
+        #self.SetIcon(wx.IconFromBitmap(wx.Bitmap('icons/feed.png')))
         self.controller = controller
         panel = self.create_panel(self)
         self.Fit()
@@ -342,9 +343,10 @@ class SettingsDialog(wx.Dialog):
         images.Add(wx.Bitmap('icons/feed32.png'))
         images.Add(wx.Bitmap('icons/comment32.png'))
         images.Add(wx.Bitmap('icons/cog32.png'))
-        notebook = wx.Toolbook(parent, -1, style=wx.BK_DEFAULT)
+        notebook = wx.Toolbook(parent, -1)
+        notebook.SetInternalBorder(0)
         notebook.AssignImageList(images)
-        feeds = FeedsPanel(notebook, self.controller, self.on_event)
+        feeds = FeedsPanel(notebook, self)
         popups = PopupsPanel(notebook)
         options = OptionsPanel(notebook)
         notebook.AddPage(feeds, 'Feeds', imageId=0)
@@ -376,19 +378,18 @@ class SettingsDialog(wx.Dialog):
     def on_event(self):
         self.apply_button.Enable()
     def on_ok(self, event):
-        event.Skip()
         self.apply()
+        event.Skip()
     def on_apply(self, event):
         self.apply()
         self.apply_button.Disable()
         
 class FeedsList(wx.ListCtrl):
-    def __init__(self, parent, controller, func):
+    def __init__(self, parent, dialog):
         style = wx.LC_REPORT|wx.LC_VIRTUAL#|wx.LC_HRULES|wx.LC_VRULES
         super(FeedsList, self).__init__(parent, -1, style=style)
-        self.controller = controller
-        self.func = func
-        feeds = self.controller.manager.feeds
+        self.dialog = dialog
+        feeds = self.dialog.controller.manager.feeds
         feeds = [feed.make_copy() for feed in feeds]
         self.feeds = feeds
         images = wx.ImageList(16, 16, True)
@@ -401,9 +402,9 @@ class FeedsList(wx.ListCtrl):
         self.InsertColumn(3, 'Feed URL')
         self.SetColumnWidth(0, -2)
         self.SetColumnWidth(1, 96)
-        self.SetColumnWidth(2, 128)
-        self.SetColumnWidth(3, 128)
-        self.SetMinSize((450, 200))
+        self.SetColumnWidth(2, 160)
+        self.SetColumnWidth(3, 160)
+        self.SetMinSize((500, 250))
         self.Bind(wx.EVT_LEFT_DOWN, self.on_left_down)
         self.update()
     def update(self):
@@ -418,7 +419,7 @@ class FeedsList(wx.ListCtrl):
         feed = self.feeds[index]
         feed.enabled = not feed.enabled
         self.RefreshItem(index)
-        self.func()
+        self.dialog.on_event()
     def OnGetItemImage(self, index):
         feed = self.feeds[index]
         return 1 if feed.enabled else 0
@@ -433,17 +434,18 @@ class FeedsList(wx.ListCtrl):
         return ''
         
 class FeedsPanel(wx.Panel):
-    def __init__(self, parent, controller, func):
+    def __init__(self, parent, dialog):
         super(FeedsPanel, self).__init__(parent, -1)
-        self.controller = controller
-        self.func = func
+        self.dialog = dialog
         panel = self.create_panel(self)
         sizer = wx.BoxSizer(wx.VERTICAL)
+        line = wx.StaticLine(self, -1)
+        sizer.Add(line, 0, wx.EXPAND)
         sizer.Add(panel, 1, wx.EXPAND|wx.ALL, 8)
         self.SetSizerAndFit(sizer)
     def create_panel(self, parent):
         panel = wx.Panel(parent, -1)
-        list = FeedsList(panel, self.controller, self.func)
+        list = FeedsList(panel, self.dialog)
         list.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_selection)
         list.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.on_selection)
         list.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.on_edit)
@@ -480,7 +482,8 @@ class FeedsPanel(wx.Panel):
     def apply(self):
         before = {}
         after = {}
-        for feed in self.controller.manager.feeds:
+        controller = self.dialog.controller
+        for feed in controller.manager.feeds:
             before[feed.uuid] = feed
         for feed in self.list.feeds:
             after[feed.uuid] = feed
@@ -491,17 +494,17 @@ class FeedsPanel(wx.Panel):
         same = after_set & before_set
         for uuid in added:
             feed = after[uuid]
-            self.controller.manager.feeds.append(feed)
+            controller.manager.feeds.append(feed)
         for uuid in deleted:
             feed = before[uuid]
-            self.controller.manager.feeds.remove(feed)
+            controller.manager.feeds.remove(feed)
         for uuid in same:
             a = before[uuid]
             b = after[uuid]
             a.copy_from(b)
     def update(self):
         self.list.update()
-        self.func()
+        self.dialog.on_event()
     def on_selection(self, event):
         event.Skip()
         count = self.list.GetSelectedItemCount()
@@ -515,14 +518,15 @@ class FeedsPanel(wx.Panel):
         feed = self.list.feeds[index]
         window = EditFeedDialog(self, feed)
         window.CenterOnScreen()
-        window.ShowModal()
+        result = window.ShowModal()
         window.Destroy()
-        self.update()
+        if result == wx.ID_OK:
+            self.update()
     def on_new(self, event):
         feed = AddFeedDialog.show_wizard(self)
         if feed:
             self.list.feeds.append(feed)
-        self.update()
+            self.update()
     def on_delete(self, event):
         feeds = []
         index = -1
@@ -532,19 +536,55 @@ class FeedsPanel(wx.Panel):
                 break
             feed = self.list.feeds[index]
             feeds.append(feed)
-        for feed in feeds:
-            self.list.feeds.remove(feed)
-        self.update()
-        
+        if feeds:
+            for feed in feeds:
+                self.list.feeds.remove(feed)
+            self.update()
+            
 class PopupsPanel(wx.Panel):
     def __init__(self, parent):
         super(PopupsPanel, self).__init__(parent, -1)
         panel = self.create_panel(self)
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(panel, 1, wx.EXPAND|wx.ALL, 8)
+        line = wx.StaticLine(self, -1)
+        sizer.Add(line, 0, wx.EXPAND)
+        sizer.Add(panel, 0, wx.LEFT|wx.TOP, 36)
         self.SetSizerAndFit(sizer)
     def create_panel(self, parent):
         panel = wx.Panel(parent, -1)
+        sizer = wx.GridBagSizer(16, 8)
+        labels = ['Theme', 'Width', 'Transparency', 'Position', 'Title Length', 'Body Length', 'Duration']
+        positions = [(0, 0), (1, 0), (2, 0), (3, 0), (0, 3), (1, 3), (2, 3)]
+        for position, label in zip(positions, labels):
+            text = wx.StaticText(panel, -1, label)
+            font = text.GetFont()
+            font.SetWeight(wx.FONTWEIGHT_BOLD)
+            text.SetFont(font)
+            sizer.Add(text, position, flag=wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT)
+        duration = wx.SpinCtrl(panel, -1, '8', min=1, max=60, size=(64, -1))
+        auto_scroll = wx.CheckBox(panel, -1, 'Auto-play')
+        auto_scroll.SetValue(True)
+        theme = wx.Choice(panel, -1)
+        theme.Append('Default', 'default')
+        theme.Select(0)
+        width = wx.SpinCtrl(panel, -1, '400', min=1, max=9999, size=(64, -1))
+        #transparency = wx.Slider(panel, -1, 230, 0, 255, size=(300, -1))
+        transparency = wx.SpinCtrl(panel, -1, '230', min=0, max=255, size=(64, -1))
+        position = wx.Choice(panel, -1)
+        position.Append('Upper Left', (-1, -1))
+        position.Append('Upper Right', (1, -1))
+        position.Append('Lower Left', (1, -1))
+        position.Append('Lower Right', (1, 1))
+        position.Append('Center', (0, 0))
+        #position.Append('Custom', None)
+        position.Select(3)
+        title_length = wx.SpinCtrl(panel, -1, '400', min=1, max=9999, size=(64, -1))
+        body_length = wx.SpinCtrl(panel, -1, '400', min=1, max=9999, size=(64, -1))
+        controls = [theme, width, transparency, position, title_length, body_length, duration, auto_scroll]
+        positions = [(0, 1), (1, 1), (2, 1), (3, 1), (0, 4), (1, 4), (2, 4), (3, 4)]
+        for position, control in zip(positions, controls):
+            sizer.Add(control, position, flag=wx.ALIGN_CENTER_VERTICAL)
+        panel.SetSizerAndFit(sizer)
         return panel
         
 class OptionsPanel(wx.Panel):

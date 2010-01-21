@@ -98,7 +98,7 @@ class Controller(object):
         self.show_items(items, index, False)
     def about(self):
         window = view.AboutDialog(self.frame)
-        window.CenterOnScreen()
+        window.Center()
         window.Show()
     def add_feed(self, url=''):
         feed = view.AddFeedDialog.show_wizard(self.frame, url)
@@ -108,7 +108,7 @@ class Controller(object):
         self._poll()
     def edit_settings(self):
         window = view.SettingsDialog(self.frame, self)
-        window.CenterOnScreen()
+        window.Center()
         window.ShowModal()
         window.Destroy()
     def close(self):
