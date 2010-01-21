@@ -343,15 +343,18 @@ class SettingsDialog(wx.Dialog):
         images.Add(wx.Bitmap('icons/feed32.png'))
         images.Add(wx.Bitmap('icons/comment32.png'))
         images.Add(wx.Bitmap('icons/cog32.png'))
+        images.Add(wx.Bitmap('icons/info32.png'))
         notebook = wx.Toolbook(parent, -1)
         notebook.SetInternalBorder(0)
         notebook.AssignImageList(images)
         feeds = FeedsPanel(notebook, self)
         popups = PopupsPanel(notebook)
         options = OptionsPanel(notebook)
+        about = AboutPanel(notebook)
         notebook.AddPage(feeds, 'Feeds', imageId=0)
         notebook.AddPage(popups, 'Pop-ups', imageId=1)
         notebook.AddPage(options, 'Options', imageId=2)
+        notebook.AddPage(about, 'About', imageId=3)
         self.feeds = feeds
         self.popups = popups
         self.options = options
@@ -449,6 +452,7 @@ class FeedsPanel(wx.Panel):
         list.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_selection)
         list.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.on_selection)
         list.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.on_edit)
+        list.Bind(wx.EVT_LEFT_DOWN, self.on_left_down)
         self.list = list
         buttons = self.create_buttons(panel)
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -510,6 +514,12 @@ class FeedsPanel(wx.Panel):
         count = self.list.GetSelectedItemCount()
         self.edit.Enable(count == 1)
         self.delete.Enable(count > 0)
+    def on_left_down(self, event):
+        index, flags = self.list.HitTest(event.GetPosition())
+        if flags & wx.LIST_HITTEST_NOWHERE:
+            self.edit.Disable()
+            self.delete.Disable()
+        event.Skip()
     def on_edit(self, event):
         count = self.list.GetSelectedItemCount()
         if count != 1:
@@ -592,6 +602,21 @@ class OptionsPanel(wx.Panel):
         super(OptionsPanel, self).__init__(parent, -1)
         panel = self.create_panel(self)
         sizer = wx.BoxSizer(wx.VERTICAL)
+        line = wx.StaticLine(self, -1)
+        sizer.Add(line, 0, wx.EXPAND)
+        sizer.Add(panel, 1, wx.EXPAND|wx.ALL, 8)
+        self.SetSizerAndFit(sizer)
+    def create_panel(self, parent):
+        panel = wx.Panel(parent, -1)
+        return panel
+        
+class AboutPanel(wx.Panel):
+    def __init__(self, parent):
+        super(AboutPanel, self).__init__(parent, -1)
+        panel = self.create_panel(self)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        line = wx.StaticLine(self, -1)
+        sizer.Add(line, 0, wx.EXPAND)
         sizer.Add(panel, 1, wx.EXPAND|wx.ALL, 8)
         self.SetSizerAndFit(sizer)
     def create_panel(self, parent):
