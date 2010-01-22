@@ -430,6 +430,7 @@ class SettingsDialog(wx.Dialog):
         notebook.AddPage(popups, 'Pop-ups', imageId=1)
         notebook.AddPage(options, 'Options', imageId=2)
         notebook.AddPage(about, 'About', imageId=3)
+        self.popups = popups
         return notebook
     def create_buttons(self, parent):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -449,6 +450,7 @@ class SettingsDialog(wx.Dialog):
         sizer.Add(apply)
         return sizer
     def apply(self):
+        self.popups.update_model()
         self.model.apply()
         self.model.controller.poll()
     def on_change(self):
@@ -740,7 +742,7 @@ class PopupsPanel(wx.Panel):
         model.POPUP_THEME = self.theme.GetClientData(self.theme.GetSelection())
         model.POPUP_POSITION = self.position.GetClientData(self.position.GetSelection())
     def on_change(self, event):
-        self.update_model()
+        #self.update_model()
         self.dialog.on_change()
         event.Skip()
         
