@@ -6,29 +6,28 @@ import view
 import threading
 from settings import settings
 
-URLS = [
-    #'http://www.michaelfogleman.com/feed/',
-    #'http://stackoverflow.com/feeds/tag/python',
-    #'http://all-devel-01/portal/feeds/experiments/',
-    #'http://all-devel-01/trac/eqteam/timeline?ticket=on&changeset=on&milestone=on&wiki=on&max=50&daysback=90&format=rss',
-    #'http://planet.python.org/rss20.xml',
-    #'http://feeds.digg.com/digg/popular.rss',
-    #'http://www.faithandfearinflushing.com/feed/',
-    #'http://stackoverflow.com/feeds/tag/java',
-    #'http://blog.computationalcomplexity.org/feeds/posts/default',
-    #'http://code.activestate.com/feeds/recipes/',
-    #'http://forums.topcoder.com/?module=RSS&categoryID=13',
-]
+'''
+http://www.michaelfogleman.com/feed/
+http://stackoverflow.com/feeds/tag/python
+http://all-devel-01/portal/feeds/experiments/
+http://all-devel-01/trac/eqteam/timeline?ticket=on&changeset=on&milestone=on&wiki=on&max=50&daysback=90&format=rss
+http://planet.python.org/rss20.xml
+http://feeds.digg.com/digg/popular.rss
+http://www.faithandfearinflushing.com/feed/
+http://stackoverflow.com/feeds/tag/java
+http://blog.computationalcomplexity.org/feeds/posts/default
+http://code.activestate.com/feeds/recipes/
+http://forums.topcoder.com/?module=RSS&categoryID=13
+'''
 
 class Controller(object):
     def __init__(self):
         self.frame = view.HiddenFrame(self)
         self.manager = feeds.FeedManager()
+        self.manager.load()
         self.popup = None
         self.polling = False
         self.enabled = True
-        for url in URLS:
-            self.manager.add_url(url)
         self.on_poll()
     def parse_args(self, message):
         urls = message.split('\n')

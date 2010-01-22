@@ -18,11 +18,11 @@ class TaskBarIcon(wx.TaskBarIcon):
         #util.menu_item(menu, 'About...', self.on_about, 'icons/information.png')
         menu.AppendSeparator()
         if self.controller.enabled:
-            util.menu_item(menu, 'Disable Feeds', self.on_disable, 'icons/delete.png')
-            util.menu_item(menu, 'Check Feeds Now', self.on_force_update, 'icons/transmit.png')
+            util.menu_item(menu, 'Disable Updates', self.on_disable, 'icons/delete.png')
+            util.menu_item(menu, 'Update Now', self.on_force_update, 'icons/transmit.png')
         else:
-            util.menu_item(menu, 'Enable Feeds', self.on_enable, 'icons/accept.png')
-            item = util.menu_item(menu, 'Check Feeds Now', self.on_force_update, 'icons/transmit.png')
+            util.menu_item(menu, 'Enable Updates', self.on_enable, 'icons/accept.png')
+            item = util.menu_item(menu, 'Update Now', self.on_force_update, 'icons/transmit.png')
             item.Enable(False)
         menu.AppendSeparator()
         util.menu_item(menu, 'Exit', self.on_exit, 'icons/door_out.png')
@@ -52,12 +52,14 @@ class TaskBarIcon(wx.TaskBarIcon):
 class HiddenFrame(wx.Frame):
     def __init__(self, controller):
         super(HiddenFrame, self).__init__(None, -1, 'Feed Notifier')
+        self.controller = controller
         self.icon = TaskBarIcon(controller)
         self.Bind(wx.EVT_CLOSE, self.on_close)
         self.CenterOnScreen()
     def on_close(self, event):
         event.Skip()
         wx.CallAfter(self.icon.Destroy)
+        self.controller.manager.save()
         
 class DialogFrame(wx.Frame):
     def __init__(self, parent, title):
@@ -251,10 +253,10 @@ class EditFeedDialog(wx.Dialog):
         _interval, _units = util.split_time(self.feed.interval)
         interval = wx.SpinCtrl(parent, -1, str(_interval), min=1, max=60, size=(64, -1))
         units = wx.Choice(parent, -1)
-        units.Append('seconds', 1)
-        units.Append('minutes', 60)
-        units.Append('hours', 60*60)
-        units.Append('days', 60*60*24)
+        units.Append('second(s)', 1)
+        units.Append('minute(s)', 60)
+        units.Append('hour(s)', 60*60)
+        units.Append('day(s)', 60*60*24)
         units.Select(_units)
         self.interval, self.units = interval, units
         sizer.Add(interval, (5, 1))

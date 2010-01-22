@@ -4,6 +4,7 @@ import calendar
 import uuid
 import urlparse
 import util
+import cPickle as pickle
 from settings import settings
 
 def cmp_timestamp(a, b):
@@ -127,4 +128,14 @@ class FeedManager(object):
             age = now - item.received
             if age > max_age:
                 self.items.remove(item)
-                
+    def load(self, path='feeds.dat'):
+        try:
+            with open(path, 'rb') as input:
+                self.feeds, self.items = pickle.load(input)
+        except Exception:
+            self.feeds, self.items = [], []
+    def save(self, path='feeds.dat'):
+        with open(path, 'wb') as output:
+            data = (self.feeds, self.items)
+            pickle.dump(data, output, -1)
+            
