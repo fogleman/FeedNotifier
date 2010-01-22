@@ -27,6 +27,12 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
+[InstallDelete]
+Type: files; Name: "{app}\images"
+Type: files; Name: "{app}\msvcp71.dll"
+Type: files; Name: "{app}\MSVCR71.dll"
+Type: files; Name: "{app}\notifier.exe.manifest"
+
 [Files]
 Source: "dist\notifier.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
