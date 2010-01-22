@@ -474,7 +474,7 @@ class FeedsList(wx.ListCtrl):
         self.InsertColumn(3, 'Feed URL')
         self.SetColumnWidth(0, -2)
         self.SetColumnWidth(1, 100)
-        self.SetColumnWidth(2, 120)
+        self.SetColumnWidth(2, 180)
         self.SetColumnWidth(3, 180)
         self.SetMinSize((500, 250))
         self.Bind(wx.EVT_LEFT_DOWN, self.on_left_down)
@@ -765,6 +765,13 @@ class AboutPanel(wx.Panel):
         sizer.Add(panel, 1, wx.EXPAND|wx.ALL, 8)
         self.SetSizerAndFit(sizer)
     def create_panel(self, parent):
-        panel = wx.Panel(parent, -1)
+        panel = wx.Panel(parent, -1, style=wx.BORDER_SUNKEN)
+        panel.SetBackgroundColour(wx.WHITE)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        bitmap = wx.StaticBitmap(panel, -1, wx.Bitmap('icons/about.png'))
+        sizer.AddStretchSpacer(1)
+        sizer.Add(bitmap, 0, wx.ALIGN_CENTER_HORIZONTAL)
+        sizer.AddStretchSpacer(1)
+        panel.SetSizerAndFit(sizer)
         return panel
         
