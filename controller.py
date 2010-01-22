@@ -53,7 +53,7 @@ class Controller(object):
             return
         if not self.enabled:
             return
-        if idle.get_idle_duration() > 60:
+        if settings.DISABLE_WHEN_IDLE and idle.get_idle_duration() > settings.USER_IDLE_TIMEOUT:
             return
         if not self.manager.should_poll():
             return

@@ -564,9 +564,12 @@ class FeedsPanel(wx.Panel):
         return sizer
     def update(self):
         self.list.update()
+        self.update_buttons()
         self.dialog.on_change()
     def on_selection(self, event):
         event.Skip()
+        self.update_buttons()
+    def update_buttons(self):
         count = self.list.GetSelectedItemCount()
         self.edit.Enable(count == 1)
         self.delete.Enable(count > 0)
