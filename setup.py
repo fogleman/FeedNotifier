@@ -25,7 +25,7 @@ def get_data_files():
     data_files = []
     data_files += tree('./icons')
     data_files += tree('./themes')
-    #data_files += include('./extras')
+    data_files += include('./extras')
     return data_files
     
 # Build the distribution.
