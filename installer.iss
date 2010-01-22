@@ -28,7 +28,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [InstallDelete]
-Type: files; Name: "{app}\images"
+Type: filesandordirs; Name: "{app}\images"
 Type: files; Name: "{app}\msvcp71.dll"
 Type: files; Name: "{app}\MSVCR71.dll"
 Type: files; Name: "{app}\notifier.exe.manifest"
