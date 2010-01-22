@@ -3,6 +3,7 @@ import util
 import feeds
 import threading
 import feedparser
+from settings import settings
 
 class TaskBarIcon(wx.TaskBarIcon):
     def __init__(self, controller):
@@ -13,8 +14,8 @@ class TaskBarIcon(wx.TaskBarIcon):
     def CreatePopupMenu(self):
         menu = wx.Menu()
         util.menu_item(menu, 'Add Feed...', self.on_add_feed, 'icons/add.png')
-        util.menu_item(menu, 'Settings...', self.on_settings, 'icons/cog.png')
-        util.menu_item(menu, 'About...', self.on_about, 'icons/information.png')
+        util.menu_item(menu, 'Preferences...', self.on_settings, 'icons/cog.png')
+        #util.menu_item(menu, 'About...', self.on_about, 'icons/information.png')
         menu.AppendSeparator()
         if self.controller.enabled:
             util.menu_item(menu, 'Disable Feeds', self.on_disable, 'icons/delete.png')
@@ -313,22 +314,38 @@ class EditFeedDialog(wx.Dialog):
         interval = int(self.interval.GetValue())
         multiplier = self.units.GetClientData(self.units.GetSelection())
         interval = interval * multiplier
+        # TODO: warning if < 60 seconds
         self.feed.title = title
         self.feed.link = link
         self.feed.interval = interval
         self.EndModal(wx.ID_OK)
         
-# TODO: cleanup code below here
 class Model(object):
     def __init__(self, controller):
         self.controller = controller
         self.reset()
     def reset(self):
+        self._sort_column = -1
         feeds = self.controller.manager.feeds
         feeds = [feed.make_copy() for feed in feeds]
         self.feeds = feeds
+        self.settings = {}
+    def __getattr__(self, key):
+        if key != key.upper():
+            return super(Model, self).__getattr__(key)
+        if key in self.settings:
+            return self.settings[key]
+        return getattr(settings, key)
+    def __setattr__(self, key, value):
+        if key != key.upper():
+            return super(Model, self).__setattr__(key, value)
+        self.settings[key] = value
     def apply(self):
         self.apply_feeds()
+        self.apply_settings()
+    def apply_settings(self):
+        for key, value in self.settings.items():
+            setattr(settings, key, value)
     def apply_feeds(self):
         before = {}
         after = {}
@@ -352,15 +369,37 @@ class Model(object):
             a = before[uuid]
             b = after[uuid]
             a.copy_from(b)
+    def sort_feeds(self, column):
+        def cmp_enabled(a, b):
+            return cmp(a.enabled, b.enabled)
+        def cmp_interval(a, b):
+            return cmp(a.interval, b.interval)
+        def cmp_title(a, b):
+            return cmp(a.title, b.title)
+        def cmp_url(a, b):
+            return cmp(a.url, b.url)
+        funcs = {
+            0: cmp_enabled,
+            1: cmp_interval,
+            2: cmp_title,
+            3: cmp_url,
+        }
+        self.feeds.sort(cmp=funcs[column])
+        if column == self._sort_column:
+            self.feeds.reverse()
+            self._sort_column = -1
+        else:
+            self._sort_column = column
             
 class SettingsDialog(wx.Dialog):
     def __init__(self, parent, controller):
         style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-        super(SettingsDialog, self).__init__(parent, -1, 'Feed Notifier Settings', style=style)
+        super(SettingsDialog, self).__init__(parent, -1, 'Feed Notifier Preferences', style=style)
         #self.SetIcon(wx.IconFromBitmap(wx.Bitmap('icons/feed.png')))
         self.model = Model(controller)
         panel = self.create_panel(self)
         self.Fit()
+        self.SetMinSize(self.GetSize())
     def create_panel(self, parent):
         panel = wx.Panel(parent, -1)
         notebook = self.create_notebook(panel)
@@ -382,7 +421,7 @@ class SettingsDialog(wx.Dialog):
         notebook.SetInternalBorder(0)
         notebook.AssignImageList(images)
         feeds = FeedsPanel(notebook, self)
-        popups = PopupsPanel(notebook)
+        popups = PopupsPanel(notebook, self)
         options = OptionsPanel(notebook)
         about = AboutPanel(notebook)
         notebook.AddPage(feeds, 'Feeds', imageId=0)
@@ -409,6 +448,7 @@ class SettingsDialog(wx.Dialog):
         return sizer
     def apply(self):
         self.model.apply()
+        self.model.controller.poll()
     def on_change(self):
         self.apply_button.Enable()
     def on_ok(self, event):
@@ -433,15 +473,20 @@ class FeedsList(wx.ListCtrl):
         self.InsertColumn(2, 'Feed Title')
         self.InsertColumn(3, 'Feed URL')
         self.SetColumnWidth(0, -2)
-        self.SetColumnWidth(1, 96)
-        self.SetColumnWidth(2, 160)
-        self.SetColumnWidth(3, 160)
+        self.SetColumnWidth(1, 100)
+        self.SetColumnWidth(2, 120)
+        self.SetColumnWidth(3, 180)
         self.SetMinSize((500, 250))
         self.Bind(wx.EVT_LEFT_DOWN, self.on_left_down)
+        self.Bind(wx.EVT_LIST_COL_CLICK, self.on_col_click)
         self.update()
     def update(self):
         self.SetItemCount(len(self.model.feeds))
         self.Refresh()
+    def on_col_click(self, event):
+        column = event.GetColumn()
+        self.model.sort_feeds(column)
+        self.update()
     def on_left_down(self, event):
         index, flags = self.HitTest(event.GetPosition())
         if index >= 0 and (flags & wx.LIST_HITTEST_ONITEMICON):
@@ -559,50 +604,143 @@ class FeedsPanel(wx.Panel):
             self.update()
             
 class PopupsPanel(wx.Panel):
-    def __init__(self, parent):
+    def __init__(self, parent, dialog):
         super(PopupsPanel, self).__init__(parent, -1)
+        self.dialog = dialog
+        self.model = dialog.model
         panel = self.create_panel(self)
         sizer = wx.BoxSizer(wx.VERTICAL)
         line = wx.StaticLine(self, -1)
         sizer.Add(line, 0, wx.EXPAND)
-        sizer.Add(panel, 0, wx.LEFT|wx.TOP, 36)
+        sizer.Add(panel, 1, wx.EXPAND|wx.ALL, 8)
         self.SetSizerAndFit(sizer)
+        self.update_controls()
     def create_panel(self, parent):
         panel = wx.Panel(parent, -1)
-        sizer = wx.GridBagSizer(16, 8)
-        labels = ['Theme', 'Width', 'Transparency', 'Position', 'Title Length', 'Body Length', 'Duration']
-        positions = [(0, 0), (1, 0), (2, 0), (3, 0), (0, 3), (1, 3), (2, 3)]
-        for position, label in zip(positions, labels):
-            text = wx.StaticText(panel, -1, label)
-            font = text.GetFont()
-            font.SetWeight(wx.FONTWEIGHT_BOLD)
-            text.SetFont(font)
-            sizer.Add(text, position, flag=wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT)
-        duration = wx.SpinCtrl(panel, -1, '8', min=1, max=60, size=(64, -1))
-        auto_scroll = wx.CheckBox(panel, -1, 'Auto-play')
-        auto_scroll.SetValue(True)
-        theme = wx.Choice(panel, -1)
-        theme.Append('Default', 'default')
-        theme.Select(0)
-        width = wx.SpinCtrl(panel, -1, '400', min=1, max=9999, size=(64, -1))
-        #transparency = wx.Slider(panel, -1, 230, 0, 255, size=(300, -1))
-        transparency = wx.SpinCtrl(panel, -1, '230', min=0, max=255, size=(64, -1))
-        position = wx.Choice(panel, -1)
-        position.Append('Upper Left', (-1, -1))
-        position.Append('Upper Right', (1, -1))
-        position.Append('Lower Left', (1, -1))
-        position.Append('Lower Right', (1, 1))
-        position.Append('Center', (0, 0))
-        #position.Append('Custom', None)
-        position.Select(3)
-        title_length = wx.SpinCtrl(panel, -1, '400', min=1, max=9999, size=(64, -1))
-        body_length = wx.SpinCtrl(panel, -1, '400', min=1, max=9999, size=(64, -1))
-        controls = [theme, width, transparency, position, title_length, body_length, duration, auto_scroll]
-        positions = [(0, 1), (1, 1), (2, 1), (3, 1), (0, 4), (1, 4), (2, 4), (3, 4)]
-        for position, control in zip(positions, controls):
-            sizer.Add(control, position, flag=wx.ALIGN_CENTER_VERTICAL)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        behavior = self.create_behavior(panel)
+        appearance = self.create_appearance(panel)
+        content = self.create_content(panel)
+        sizer.Add(behavior, 0, wx.EXPAND)
+        sizer.AddSpacer(8)
+        sizer.Add(appearance, 0, wx.EXPAND)
+        sizer.AddSpacer(8)
+        sizer.Add(content, 0, wx.EXPAND)
         panel.SetSizerAndFit(sizer)
         return panel
+    def create_appearance(self, parent):
+        box = wx.StaticBox(parent, -1, 'Appearance')
+        sizer = wx.StaticBoxSizer(box, wx.VERTICAL)
+        grid = wx.GridBagSizer(8, 8)
+        labels = ['Theme', 'Width', 'Position', 'Transparency']
+        positions = [(0, 0), (0, 3), (1, 0), (1, 3)]
+        for label, position in zip(labels, positions):
+            text = wx.StaticText(parent, -1, label)
+            grid.Add(text, position, flag=wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT)
+        theme = wx.Choice(parent, -1)
+        theme.Append('Default', 'default')
+        position = wx.Choice(parent, -1)
+        position.Append('Upper Left', (-1, -1))
+        position.Append('Upper Right', (1, -1))
+        position.Append('Lower Left', (-1, 1))
+        position.Append('Lower Right', (1, 1))
+        position.Append('Center', (0, 0))
+        width = wx.SpinCtrl(parent, -1, '1', min=1, max=9999, size=(64, -1))
+        transparency = wx.SpinCtrl(parent, -1, '0', min=0, max=255, size=(64, -1))
+        grid.Add(theme, (0, 1))
+        grid.Add(position, (1, 1))
+        grid.Add(width, (0, 4))
+        grid.Add(transparency, (1, 4))
+        text = wx.StaticText(parent, -1, 'pixels')
+        grid.Add(text, (0, 5), flag=wx.ALIGN_CENTER_VERTICAL)
+        text = wx.StaticText(parent, -1, '[0-255], 255=opaque')
+        grid.Add(text, (1, 5), flag=wx.ALIGN_CENTER_VERTICAL)
+        sizer.Add(grid, 1, wx.EXPAND|wx.ALL, 8)
+        
+        theme.Bind(wx.EVT_CHOICE, self.on_change)
+        position.Bind(wx.EVT_CHOICE, self.on_change)
+        width.Bind(wx.EVT_SPINCTRL, self.on_change)
+        transparency.Bind(wx.EVT_SPINCTRL, self.on_change)
+        
+        self.theme = theme
+        self.position = position
+        self.width = width
+        self.transparency = transparency
+        return sizer
+    def create_behavior(self, parent):
+        box = wx.StaticBox(parent, -1, 'Behavior')
+        sizer = wx.StaticBoxSizer(box, wx.VERTICAL)
+        grid = wx.GridBagSizer(8, 8)
+        
+        text = wx.StaticText(parent, -1, 'Duration')
+        grid.Add(text, (0, 0), flag=wx.ALIGN_CENTER_VERTICAL)
+        text = wx.StaticText(parent, -1, 'seconds')
+        grid.Add(text, (0, 2), flag=wx.ALIGN_CENTER_VERTICAL)
+        
+        duration = wx.SpinCtrl(parent, -1, '1', min=1, max=60, size=(64, -1))
+        auto = wx.CheckBox(parent, -1, 'Auto-play new items')
+        grid.Add(duration, (0, 1))
+        grid.Add(auto, (0, 4), flag=wx.ALIGN_CENTER_VERTICAL)
+        
+        sizer.Add(grid, 1, wx.EXPAND|wx.ALL, 8)
+        
+        duration.Bind(wx.EVT_SPINCTRL, self.on_change)
+        auto.Bind(wx.EVT_CHECKBOX, self.on_change)
+        
+        self.duration = duration
+        self.auto = auto
+        return sizer
+    def create_content(self, parent):
+        box = wx.StaticBox(parent, -1, 'Content')
+        sizer = wx.StaticBoxSizer(box, wx.VERTICAL)
+        grid = wx.GridBagSizer(8, 8)
+        
+        text = wx.StaticText(parent, -1, 'Max. Title Length')
+        grid.Add(text, (0, 0), flag=wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT)
+        text = wx.StaticText(parent, -1, 'Max. Body Length')
+        grid.Add(text, (1, 0), flag=wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT)
+        text = wx.StaticText(parent, -1, 'characters')
+        grid.Add(text, (0, 2), flag=wx.ALIGN_CENTER_VERTICAL)
+        text = wx.StaticText(parent, -1, 'characters')
+        grid.Add(text, (1, 2), flag=wx.ALIGN_CENTER_VERTICAL)
+        
+        title = wx.SpinCtrl(parent, -1, '1', min=1, max=9999, size=(64, -1))
+        body = wx.SpinCtrl(parent, -1, '1', min=1, max=9999, size=(64, -1))
+        grid.Add(title, (0, 1))
+        grid.Add(body, (1, 1))
+        
+        sizer.Add(grid, 1, wx.EXPAND|wx.ALL, 8)
+        
+        title.Bind(wx.EVT_SPINCTRL, self.on_change)
+        body.Bind(wx.EVT_SPINCTRL, self.on_change)
+        
+        self.title = title
+        self.body = body
+        return sizer
+    def update_controls(self):
+        model = self.model
+        self.width.SetValue(model.POPUP_WIDTH)
+        self.transparency.SetValue(model.POPUP_TRANSPARENCY)
+        self.duration.SetValue(model.POPUP_DURATION)
+        self.auto.SetValue(model.POPUP_AUTO_PLAY)
+        self.title.SetValue(model.POPUP_TITLE_LENGTH)
+        self.body.SetValue(model.POPUP_BODY_LENGTH)
+        util.select_choice(self.theme, model.POPUP_THEME)
+        util.select_choice(self.position, model.POPUP_POSITION)
+    def update_model(self):
+        model = self.model
+        model.POPUP_WIDTH = self.width.GetValue()
+        model.POPUP_TRANSPARENCY = self.transparency.GetValue()
+        model.POPUP_DURATION = self.duration.GetValue()
+        model.POPUP_TITLE_LENGTH = self.title.GetValue()
+        model.POPUP_BODY_LENGTH = self.body.GetValue()
+        model.POPUP_AUTO_PLAY = self.auto.GetValue()
+        model.POPUP_THEME = self.theme.GetClientData(self.theme.GetSelection())
+        model.POPUP_POSITION = self.position.GetClientData(self.position.GetSelection())
+    def on_change(self, event):
+        self.update_model()
+        self.dialog.on_change()
+        event.Skip()
         
 class OptionsPanel(wx.Panel):
     def __init__(self, parent):

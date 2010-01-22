@@ -12,6 +12,13 @@ def menu_item(menu, label, func, icon=None, kind=wx.ITEM_NORMAL):
     menu.AppendItem(item)
     return item
     
+def select_choice(choice, data):
+    for index in range(choice.GetCount()):
+        if choice.GetClientData(index) == data:
+            choice.Select(index)
+            return
+    choice.Select(wx.NOT_FOUND)
+    
 def time_since(t):
     t = int(t)
     now = int(time.time())

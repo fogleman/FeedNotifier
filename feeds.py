@@ -4,6 +4,7 @@ import calendar
 import uuid
 import urlparse
 import util
+from settings import settings
 
 def cmp_timestamp(a, b):
     return cmp(a.timestamp, b.timestamp)
@@ -42,7 +43,7 @@ class Feed(object):
         self.url = url
         self.enabled = True
         self.last_poll = 0
-        self.interval = 60 * 5
+        self.interval = settings.DEFAULT_POLLING_INTERVAL
         self.etag = None
         self.modified = None
         self.title = ''
@@ -64,7 +65,7 @@ class Feed(object):
         components = urlparse.urlsplit(self.url)
         scheme, domain = components[:2]
         return '%s://%s/favicon.ico' % (scheme, domain)
-    def clean_cache(self, size=1000):
+    def clean_cache(self, size):
         for id in self.id_list[:-size]:
             self.id_set.remove(id)
         self.id_list = self.id_list[-size:]
@@ -82,7 +83,7 @@ class Feed(object):
         self.etag = d.get('etag', None)
         self.modified = d.get('modified', None)
         feed = d.get('feed', None)
-        if feed: # TODO: let user do this when adding feed
+        if feed:
             self.title = self.title or feed.get('title', '')
             self.link = self.link or feed.get('link', self.url)
         entries = d.get('entries', [])
@@ -94,12 +95,12 @@ class Feed(object):
             self.id_set.add(id)
             item = Item(self, id)
             item.timestamp = calendar.timegm(entry.get('date_parsed', time.gmtime()))
-            item.title = util.format(entry.get('title', ''))
-            item.description = util.format(entry.get('description', ''))
+            item.title = util.format(entry.get('title', ''), settings.POPUP_TITLE_LENGTH)
+            item.description = util.format(entry.get('description', ''), settings.POPUP_BODY_LENGTH)
             item.link = entry.get('link', '')
-            item.author = util.format(entry.get('author', ''))
+            item.author = util.format(entry.get('author', '')) # TODO: max length
             result.append(item)
-        self.clean_cache()
+        self.clean_cache(settings.FEED_CACHE_SIZE)
         return result
         
 class FeedManager(object):
@@ -120,7 +121,7 @@ class FeedManager(object):
                 all_items.extend(items)
         all_items.sort(cmp=cmp_timestamp)
         return all_items
-    def purge_items(self, max_age=60*60*24*7):
+    def purge_items(self, max_age):
         now = int(time.time())
         for item in list(self.items):
             age = now - item.received

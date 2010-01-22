@@ -4,6 +4,7 @@ import feeds
 import popups
 import view
 import threading
+from settings import settings
 
 URLS = [
     #'http://www.michaelfogleman.com/feed/',
@@ -28,7 +29,7 @@ class Controller(object):
         self.enabled = True
         for url in URLS:
             self.manager.add_url(url)
-        self.poll()
+        self.on_poll()
     def parse_args(self, message):
         urls = message.split('\n')
         for url in urls:
@@ -39,16 +40,16 @@ class Controller(object):
     def enable(self):
         self.frame.icon.set_icon('icons/feed.png')
         self.enabled = True
-        self._poll()
+        self.poll()
     def disable(self):
         self.frame.icon.set_icon('icons/feed_delete.png')
         self.enabled = False
-    def poll(self):
+    def on_poll(self):
         try:
-            self._poll()
+            self.poll()
         finally:
-            wx.CallLater(5000, self.poll)
-    def _poll(self):
+            wx.CallLater(5000, self.on_poll)
+    def poll(self):
         if self.polling:
             return
         if not self.enabled:
@@ -82,7 +83,7 @@ class Controller(object):
     def force_poll(self):
         for feed in self.manager.feeds:
             feed.last_poll = 0
-        self._poll()
+        self.poll()
     def show_items(self, items, index, auto=None):
         if not items:
             return
@@ -105,7 +106,7 @@ class Controller(object):
         if not feed:
             return
         self.manager.feeds.append(feed)
-        self._poll()
+        self.poll()
     def edit_settings(self):
         window = view.SettingsDialog(self.frame, self)
         window.Center()
@@ -117,5 +118,5 @@ class Controller(object):
         self.frame.Close()
     def on_popup_close(self, event):
         self.popup = None
-        self.manager.purge_items()
+        self.manager.purge_items(settings.ITEM_CACHE_AGE)
         

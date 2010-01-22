@@ -2,6 +2,7 @@ import wx
 import wx.lib.iewin as ie
 import webbrowser
 import templates
+from settings import settings
 
 BLANK = 'about:blank'
 COMMAND_CLOSE = 'feednotifier://close/'
@@ -43,7 +44,7 @@ class PopupFrame(wx.Frame):
         style = wx.STAY_ON_TOP | wx.FRAME_NO_TASKBAR | wx.BORDER_NONE
         title = 'Feed Notifier'
         super(PopupFrame, self).__init__(None, -1, title, style=style)
-        self.SetTransparent(230)
+        self.SetTransparent(settings.POPUP_TRANSPARENCY)
         self.control = BrowserControl(self)
     def load_src(self, html):
         control = self.control
@@ -52,15 +53,27 @@ class PopupFrame(wx.Frame):
         self.Fit()
         x, y, w, h = wx.ClientDisplayRect()
         cw, ch = self.GetSize()
-        x = x + w - cw - 10
-        y = y + h - ch - 10
-        self.SetPosition((x, y))
+        pad = 10
+        x1 = x + pad
+        y1 = y + pad
+        x2 = x + w - cw - pad
+        y2 = y + h - ch - pad
+        x3 = x + w / 2 - cw / 2
+        y3 = y + h / 2 - ch / 2
+        lookup = {
+            (-1, -1): (x1, y1),
+            (1, -1): (x2, y1),
+            (-1, 1): (x1, y2),
+            (1, 1): (x2, y2),
+            (0, 0): (x3, y3),
+        }
+        self.SetPosition(lookup[settings.POPUP_POSITION])
         
 class PopupManager(wx.EvtHandler):
     def __init__(self):
         super(PopupManager, self).__init__()
         self.timer = None
-        self.auto = True
+        self.auto = settings.POPUP_AUTO_PLAY
         self.cache = {}
     def set_items(self, items, index=0):
         self.clear_cache()
@@ -125,6 +138,7 @@ class PopupManager(wx.EvtHandler):
         context['item_count'] = count
         context['is_playing'] = self.auto
         context['is_paused'] = not self.auto
+        context['POPUP_WIDTH'] = settings.POPUP_WIDTH
         context['COMMAND_CLOSE'] = COMMAND_CLOSE
         context['COMMAND_NEXT'] = COMMAND_NEXT
         context['COMMAND_PREVIOUS'] = COMMAND_PREVIOUS
@@ -137,7 +151,8 @@ class PopupManager(wx.EvtHandler):
     def set_timer(self):
         if self.timer and self.timer.IsRunning():
             return
-        self.timer = wx.CallLater(8000, self.on_timer)
+        duration = settings.POPUP_DURATION * 1000
+        self.timer = wx.CallLater(duration, self.on_timer)
     def stop_timer(self):
         if self.timer and self.timer.IsRunning():
             self.timer.Stop()

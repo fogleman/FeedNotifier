@@ -20,7 +20,7 @@ a img {
 }
 
 #container {
-    width: 400px;
+    width: {{ POPUP_WIDTH }}px;
     border: 3px solid #000;
 }
 
