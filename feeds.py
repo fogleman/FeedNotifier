@@ -77,7 +77,6 @@ class Feed(object):
         duration = now - self.last_poll
         return duration >= self.interval
     def poll(self):
-        print 'Polling', self.url
         result = []
         self.last_poll = int(time.time())
         d = feedparser.parse(self.url, etag=self.etag, modified=self.modified)
