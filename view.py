@@ -433,13 +433,14 @@ class SettingsDialog(wx.Dialog):
         notebook.AssignImageList(images)
         feeds = FeedsPanel(notebook, self)
         popups = PopupsPanel(notebook, self)
-        options = OptionsPanel(notebook)
+        options = OptionsPanel(notebook, self)
         about = AboutPanel(notebook)
         notebook.AddPage(feeds, 'Feeds', imageId=0)
         notebook.AddPage(popups, 'Pop-ups', imageId=1)
         notebook.AddPage(options, 'Options', imageId=2)
         notebook.AddPage(about, 'About', imageId=3)
         self.popups = popups
+        self.options = options
         return notebook
     def create_buttons(self, parent):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -460,6 +461,7 @@ class SettingsDialog(wx.Dialog):
         return sizer
     def apply(self):
         self.popups.update_model()
+        self.options.update_model()
         self.model.apply()
         self.model.controller.poll()
     def on_change(self):
@@ -754,22 +756,111 @@ class PopupsPanel(wx.Panel):
         model.POPUP_THEME = self.theme.GetClientData(self.theme.GetSelection())
         model.POPUP_POSITION = self.position.GetClientData(self.position.GetSelection())
     def on_change(self, event):
-        #self.update_model()
         self.dialog.on_change()
         event.Skip()
         
 class OptionsPanel(wx.Panel):
-    def __init__(self, parent):
+    def __init__(self, parent, dialog):
         super(OptionsPanel, self).__init__(parent, -1)
+        self.dialog = dialog
+        self.model = dialog.model
         panel = self.create_panel(self)
         sizer = wx.BoxSizer(wx.VERTICAL)
         line = wx.StaticLine(self, -1)
         sizer.Add(line, 0, wx.EXPAND)
         sizer.Add(panel, 1, wx.EXPAND|wx.ALL, 8)
         self.SetSizerAndFit(sizer)
+        self.update_controls()
     def create_panel(self, parent):
         panel = wx.Panel(parent, -1)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        polling = self.create_polling(panel)
+        caching = self.create_caching(panel)
+        sizer.Add(polling, 0, wx.EXPAND)
+        sizer.AddSpacer(8)
+        sizer.Add(caching, 0, wx.EXPAND)
+        panel.SetSizerAndFit(sizer)
         return panel
+    def create_polling(self, parent):
+        box = wx.StaticBox(parent, -1, 'Polling')
+        sizer = wx.StaticBoxSizer(box, wx.VERTICAL)
+        grid = wx.GridBagSizer(8, 8)
+        
+        idle = wx.CheckBox(parent, -1, "Don't check feeds if I've been idle for")
+        grid.Add(idle, (0, 0), flag=wx.ALIGN_CENTER_VERTICAL)
+        text = wx.StaticText(parent, -1, 'seconds')
+        grid.Add(text, (0, 2), flag=wx.ALIGN_CENTER_VERTICAL)
+        
+        timeout = wx.SpinCtrl(parent, -1, '1', min=1, max=9999, size=(64, -1))
+        grid.Add(timeout, (0, 1))
+        
+        sizer.Add(grid, 1, wx.EXPAND|wx.ALL, 8)
+        
+        timeout.Bind(wx.EVT_SPINCTRL, self.on_change)
+        idle.Bind(wx.EVT_CHECKBOX, self.on_change)
+        
+        self.idle = idle
+        self.timeout = timeout
+        return sizer
+    def create_caching(self, parent):
+        box = wx.StaticBox(parent, -1, 'Caching')
+        sizer = wx.StaticBoxSizer(box, wx.VERTICAL)
+        grid = wx.GridBagSizer(8, 8)
+        
+        text = wx.StaticText(parent, -1, 'Item History')
+        grid.Add(text, (0, 0), flag=wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT)
+        text = wx.StaticText(parent, -1, 'Feed Cache')
+        grid.Add(text, (1, 0), flag=wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT)
+        text = wx.StaticText(parent, -1, 'days')
+        grid.Add(text, (0, 2), flag=wx.ALIGN_CENTER_VERTICAL)
+        text = wx.StaticText(parent, -1, 'items per feed')
+        grid.Add(text, (1, 2), flag=wx.ALIGN_CENTER_VERTICAL)
+        
+        item = wx.SpinCtrl(parent, -1, '1', min=1, max=365, size=(64, -1))
+        grid.Add(item, (0, 1))
+        feed = wx.SpinCtrl(parent, -1, '1', min=1, max=9999, size=(64, -1))
+        grid.Add(feed, (1, 1))
+        
+        clear_item = wx.Button(parent, -1, 'Clear')
+        grid.Add(clear_item, (0, 3))
+        clear_feed = wx.Button(parent, -1, 'Clear')
+        grid.Add(clear_feed, (1, 3))
+        
+        sizer.Add(grid, 1, wx.EXPAND|wx.ALL, 8)
+        
+        item.Bind(wx.EVT_SPINCTRL, self.on_change)
+        feed.Bind(wx.EVT_SPINCTRL, self.on_change)
+        clear_item.Bind(wx.EVT_BUTTON, self.on_clear_item)
+        clear_feed.Bind(wx.EVT_BUTTON, self.on_clear_feed)
+        
+        self.item = item
+        self.feed = feed
+        self.clear_item = clear_item
+        self.clear_feed = clear_feed
+        return sizer
+    def update_controls(self):
+        model = self.model
+        self.idle.SetValue(model.DISABLE_WHEN_IDLE)
+        self.timeout.SetValue(model.USER_IDLE_TIMEOUT)
+        one_day = 60 * 60 * 24
+        self.item.SetValue(model.ITEM_CACHE_AGE / one_day)
+        self.feed.SetValue(model.FEED_CACHE_SIZE)
+    def update_model(self):
+        model = self.model
+        model.DISABLE_WHEN_IDLE = self.idle.GetValue()
+        model.USER_IDLE_TIMEOUT = self.timeout.GetValue()
+        one_day = 60 * 60 * 24
+        model.ITEM_CACHE_AGE = self.item.GetValue() * one_day
+        model.FEED_CACHE_SIZE = self.feed.GetValue()
+    def on_change(self, event):
+        self.dialog.on_change()
+        event.Skip()
+    def on_clear_item(self, event):
+        self.model.controller.manager.clear_item_history()
+        self.clear_item.Disable()
+    def on_clear_feed(self, event):
+        self.model.controller.manager.clear_feed_cache()
+        self.clear_feed.Disable()
         
 class AboutPanel(wx.Panel):
     def __init__(self, parent):

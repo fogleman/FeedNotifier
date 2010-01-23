@@ -66,6 +66,9 @@ class Feed(object):
         components = urlparse.urlsplit(self.url)
         scheme, domain = components[:2]
         return '%s://%s/favicon.ico' % (scheme, domain)
+    def clear_cache(self):
+        self.id_list = []
+        self.id_set = set()
     def clean_cache(self, size):
         for id in self.id_list[:-size]:
             self.id_set.remove(id)
@@ -137,4 +140,9 @@ class FeedManager(object):
         with open(path, 'wb') as output:
             data = (self.feeds, self.items)
             pickle.dump(data, output, -1)
+    def clear_item_history(self):
+        del self.items[:]
+    def clear_feed_cache(self):
+        for feed in self.feeds:
+            feed.clear_cache()
             
