@@ -1,0 +1,14 @@
+{% extends reldir ~ '/base.html' %}
+{% block body %}
+    <div id='container'>
+        <div id='close'>
+            <a href='{{ COMMAND_CLOSE }}'><img src='{{ absdir }}/cross.png' /></a>
+        </div>
+        <div id='feed'>
+            <a href='{{ feed.link }}'>{{ feed.title }}</a>
+        </div>
+        <div id='item'>
+            <a href='{{ item.link }}'>{{ item.title }}</a>
+        </div>
+    </div>
+{% endblock %}

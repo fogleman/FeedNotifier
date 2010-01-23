@@ -1,0 +1,47 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Tahoma, Arial, sans-serif;
+    cursor: default;
+}
+
+a {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a img {
+    border: none;
+}
+
+#container {
+    width: {{ POPUP_WIDTH }}px;
+    border: 1px solid #000;
+    padding: 8px;
+}
+
+#feed, #item {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#feed {
+    font-size: 10pt;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+#item {
+    font-size: 10pt;
+    float: left;
+}
+
+#close {
+    float: right;
+}
