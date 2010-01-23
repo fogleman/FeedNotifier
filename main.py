@@ -1,7 +1,15 @@
 import wx
+import os
 import ipc
 import controller
 
+def set_path():
+    file = controller.__file__
+    file = os.path.abspath(file)
+    while file and not os.path.isdir(file):
+        file, ext = os.path.split(file)
+    os.chdir(file)
+    
 def main():
     container, message = ipc.init()
     if not container:
