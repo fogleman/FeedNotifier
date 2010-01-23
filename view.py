@@ -469,8 +469,8 @@ class FeedsList(wx.ListCtrl):
         self.dialog = dialog
         self.model = dialog.model
         images = wx.ImageList(16, 16, True)
-        self.unchecked = images.AddWithColourMask(wx.Bitmap('icons/unchecked.png'), wx.WHITE)
-        self.checked = images.AddWithColourMask(wx.Bitmap('icons/checked.png'), wx.WHITE)
+        images.AddWithColourMask(wx.Bitmap('icons/unchecked.png'), wx.WHITE)
+        images.AddWithColourMask(wx.Bitmap('icons/checked.png'), wx.WHITE)
         self.AssignImageList(images, wx.IMAGE_LIST_SMALL)
         self.InsertColumn(0, 'Enabled')
         self.InsertColumn(1, 'Interval')
