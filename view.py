@@ -15,7 +15,6 @@ class TaskBarIcon(wx.TaskBarIcon):
         menu = wx.Menu()
         util.menu_item(menu, 'Add Feed...', self.on_add_feed, 'icons/add.png')
         util.menu_item(menu, 'Preferences...', self.on_settings, 'icons/cog.png')
-        #util.menu_item(menu, 'About...', self.on_about, 'icons/information.png')
         menu.AppendSeparator()
         if self.controller.enabled:
             util.menu_item(menu, 'Disable Updates', self.on_disable, 'icons/delete.png')
@@ -38,8 +37,6 @@ class TaskBarIcon(wx.TaskBarIcon):
         self.controller.show_popup()
     def on_force_update(self, event):
         self.controller.force_poll()
-    def on_about(self, event):
-        self.controller.about()
     def on_disable(self, event):
         self.controller.disable()
     def on_enable(self, event):
@@ -60,22 +57,6 @@ class HiddenFrame(wx.Frame):
         event.Skip()
         wx.CallAfter(self.icon.Destroy)
         self.controller.manager.save()
-        
-class DialogFrame(wx.Frame):
-    def __init__(self, parent, title):
-        style = wx.DEFAULT_FRAME_STYLE & ~wx.MAXIMIZE_BOX & ~wx.RESIZE_BORDER
-        super(DialogFrame, self).__init__(parent, -1, title, style=style)
-        self.SetIcon(wx.IconFromBitmap(wx.Bitmap('icons/feed.png')))
-        
-class AboutDialog(DialogFrame):
-    def __init__(self, parent):
-        super(AboutDialog, self).__init__(parent, 'About Feed Notifier 2.0')
-        panel = wx.Panel(self, -1)
-        bitmap = wx.StaticBitmap(panel, -1, wx.Bitmap('icons/about.png'), style=wx.BORDER_SUNKEN)
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(bitmap, 0, wx.ALL, 10)
-        panel.SetSizerAndFit(sizer)
-        self.Fit()
         
 class AddFeedDialog(wx.Dialog):
     @staticmethod

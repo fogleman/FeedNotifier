@@ -91,10 +91,6 @@ class Controller(object):
         items = self.manager.items
         index = len(items) - 1
         self.show_items(items, index, False)
-    def about(self):
-        window = view.AboutDialog(self.frame)
-        window.Center()
-        window.Show()
     def add_feed(self, url=''):
         feed = view.AddFeedDialog.show_wizard(self.frame, url)
         if not feed:
