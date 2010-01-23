@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Feed Notifier - Welcome Feed</title>
+    <link href="http://www.feed-notifier.com/" />
+    <author>
+        <name>Michael Fogleman</name>
+    </author>
+    <entry>
+        <title>Feed Notifier Welcomes You!</title>
+        <link href="http://www.feed-notifier.com/" />
+        <id>urn:uuid:8d8451c3-dc10-4192-8e12-976cf1fb39f2</id>
+        <updated>2010-01-23T00:00:00Z</updated>
+        <summary>
+            Thanks for downloading Feed Notifier!
+            Right-click on the RSS icon in the system tray to add more 
+            feeds and setup other preferences.
+        </summary>
+    </entry>
+</feed>

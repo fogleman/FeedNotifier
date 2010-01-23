@@ -1,0 +1,13 @@
+body {
+    font-family: Tahoma, Arial, sans-serif;
+    margin: 25px 75px;
+    padding: 0;
+}
+
+li {
+    line-height: 133%;
+}
+
+img {
+    vertical-align: middle;
+}
