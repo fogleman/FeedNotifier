@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <title>Feed Notifier</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+        <style type="text/css" media="all">
+            body {
+    margin: 0;
+    padding: 0;
+    font-family: Tahoma, Arial, sans-serif;
+    cursor: default;
+}
+
+a {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a img {
+    border: none;
+}
+
+#container {
+    width: 400px;
+    border: 3px solid #000;
+}
+
+#wrapper {
+    border: 1px solid #fff;
+}
+
+#header {
+    padding: 4px;
+    background: #ddd;
+}
+
+#header img {
+    margin: 4px;
+}
+
+#icon {
+    float: left;
+}
+
+#feed {
+    margin-left: 32px;
+    margin-right: 32px;
+    font-size: 8pt;
+}
+
+#feed-title {
+    font-weight: bold;
+}
+
+#close {
+    float: right;
+}
+
+#body {
+    clear: both;
+    padding: 8px;
+    border-top: 1px dotted #000;
+    border-bottom: 1px dotted #000;
+}
+
+#item-title {
+    font-size: 12pt;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+#item-description {
+    font-size: 10pt;
+}
+
+#footer {
+    padding: 4px;
+    background: #eee;
+    font-size: 8pt;
+    text-align: left;
+}
+
+#footer img {
+    margin: 0 3px;
+    vertical-align: middle;
+}
+
+#footer span {
+    margin: 0 3px;
+}
+
+#footer #controls {
+    float: right;
+}
+        </style>
+    </head>
+    <body scroll='no' oncontextmenu='return false;' onselectstart='return false;'>
+        
+    <div id='container'>
+        <div id='wrapper'>
+            <div id='header'>
+                <div id='icon'>
+                    <img width='16' height='16' src='feed.png' />
+                </div>
+                <div id='close'>
+                    <a href='feednotifier://close/'><img width='16' height='16' src='cross.png' /></a>
+                </div>
+                <div id='feed'>
+                    <div id='feed-title'>
+                        <a href='http://code.activestate.com/recipes/'>ActiveState Code: New Recipes</a>
+                    </div>
+                    <div id='item-author'>
+                        8 hours ago by Logic Kills
+                    </div>
+                </div>
+            </div>
+            <div id='body'>
+                <div id='item-title'>
+                    <a href='http://code.activestate.com/recipes/577019/'>Firefox History Grabber (C)</a>
+                </div>
+                <div id='item-description'>
+                    C recipe 577019 by Logic Kills (browser hacking, firefox, flashdrive, forensics, IT Security, sqlite). I have recently been looking into IT forensics and have made a few tools that help with that kind of stuff. This program find and grabs the history.sqlite file from the browser. It then exports it to the directory and drive the program is being executed from. It is meant to be installed on a [...]
+                </div>
+            </div>
+            <div id='footer'>
+                <div id='controls'>
+                    <a href='feednotifier://play/'><img width='16' height='16' src='control_play.png' /></a>
+                    <a href='feednotifier://pause/'><img width='16' height='16' src='control_pause.png' /></a>
+                </div>
+                <a href='feednotifier://first/'><img width='16' height='16' src='control_start.png' /></a>
+                <a href='feednotifier://previous/'><img width='16' height='16' src='control_rewind.png' /></a>
+                <span>474 of 503</span>
+                <a href='feednotifier://next/'><img width='16' height='16' src='control_fastforward.png' /></a>
+                <a href='feednotifier://last/'><img width='16' height='16' src='control_end.png' /></a>
+            </div>
+        </div>
+    </div>
+
+        <script type="text/javascript">
+            document.body.onclick = function(e) {
+                var target = e ? e.target : window.event.srcElement;
+                var name = target.nodeName.toLowerCase()
+                if (name != 'a' && name != 'img') {
+                    window.location.href = 'feednotifier://next/'
+                }
+            };
+        </script>
+    </body>
+</html>
