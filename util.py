@@ -1,4 +1,5 @@
 import wx
+import os
 import re
 import time
 import calendar
@@ -20,6 +21,17 @@ def select_choice(choice, data):
             choice.Select(index)
             return
     choice.Select(wx.NOT_FOUND)
+    
+def find_themes():
+    result = []
+    names = os.listdir('themes')
+    for name in names:
+        if name.startswith('.'):
+            continue
+        path = os.path.join('themes', name)
+        if os.path.isdir(path):
+            result.append(name)
+    return result
     
 def guess_polling_interval(entries):
     if len(entries) < 2:
@@ -91,6 +103,17 @@ def split_time_str(seconds):
     if interval != 1:
         string += 's'
     return '%d %s' % (interval, string)
+    
+def pretty_name(name):
+    name = ' '.join(s.title() for s in name.split('_'))
+    last = '0'
+    result = ''
+    for c in name:
+        if c.isdigit() and not last.isdigit():
+            result += ' '
+        result += c
+        last = c
+    return result
     
 def replace_entities1(text):
     entity = re.compile(r'&#(\d+);')

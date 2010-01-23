@@ -148,7 +148,7 @@ class PopupManager(wx.EvtHandler):
         context['COMMAND_LAST'] = COMMAND_LAST
         context['COMMAND_PLAY'] = COMMAND_PLAY
         context['COMMAND_PAUSE'] = COMMAND_PAUSE
-        html = templates.render('default', item, context)
+        html = templates.render(settings.POPUP_THEME, item, context)
         return html
     def set_timer(self):
         if self.timer and self.timer.IsRunning():

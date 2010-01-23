@@ -637,7 +637,8 @@ class PopupsPanel(wx.Panel):
             text = wx.StaticText(parent, -1, label)
             grid.Add(text, position, flag=wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT)
         theme = wx.Choice(parent, -1)
-        theme.Append('Default', 'default')
+        for name in util.find_themes():
+            theme.Append(util.pretty_name(name), name)
         position = wx.Choice(parent, -1)
         position.Append('Upper Left', (-1, -1))
         position.Append('Upper Right', (1, -1))

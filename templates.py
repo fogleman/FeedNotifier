@@ -1,6 +1,8 @@
 import os
 import jinja2 as jinja
 
+DEFAULT_THEME = 'default'
+
 def create_env():
     path = os.path.abspath('.')
     loader = jinja.FileSystemLoader(path)
@@ -8,15 +10,20 @@ def create_env():
     return env
     
 def render(theme, item, context=None):
-    relative_dir = 'themes/%s' % theme
-    dir = os.path.abspath(relative_dir)
-    path = 'themes/%s/index.html' % theme
-    template = env.get_template(path)
+    reldir = 'themes/%s' % theme
+    absdir = os.path.abspath(reldir)
     context = context or {}
     context['item'] = item
     context['feed'] = item.feed
-    context['dir'] = dir
-    context['relative_dir'] = relative_dir
-    return template.render(context)
-    
+    context['reldir'] = reldir
+    context['absdir'] = absdir
+    try:
+        template = 'themes/%s/index.html' % theme
+        template = env.get_template(template)
+        return template.render(context)
+    except Exception:
+        if theme == DEFAULT_THEME:
+            raise
+        return render(DEFAULT_THEME, item, context)
+        
 env = create_env()
