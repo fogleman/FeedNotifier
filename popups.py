@@ -88,15 +88,17 @@ class PopupManager(wx.EvtHandler):
             self.show_frame()
             self.update_cache()
         else:
-            self.update_cache()
+            self.update_cache(True)
             self.show_frame()
-    def update_cache(self):
+            self.update_cache()
+    def update_cache(self, current_only=False):
         indexes = set()
-        #indexes.add(0)
-        indexes.add(self.index - 1)
         indexes.add(self.index)
-        indexes.add(self.index + 1)
-        #indexes.add(self.count - 1)
+        if not current_only:
+            indexes.add(self.index - 1)
+            indexes.add(self.index + 1)
+            #indexes.add(0)
+            #indexes.add(self.count - 1)
         items = set(self.items[index] for index in indexes if index >= 0 and index < self.count)
         for item in items:
             if item in self.cache:
