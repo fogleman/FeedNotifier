@@ -11,6 +11,7 @@ def set_path():
     os.chdir(file)
     
 def main():
+    set_path()
     container, message = ipc.init()
     if not container:
         return
