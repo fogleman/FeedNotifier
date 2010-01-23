@@ -89,9 +89,11 @@ class AddFeedDialog(wx.Dialog):
             if result != wx.ID_OK:
                 return None
             url = data.href
+            entries = data.get('entries', [])
             feed = feeds.Feed(url)
             feed.title = data.feed.title
             feed.link = data.feed.link
+            feed.interval = util.guess_polling_interval(entries)
             window = EditFeedDialog(parent, feed, True)
             window.Center()
             result = window.ShowModal()
@@ -269,7 +271,7 @@ class EditFeedDialog(wx.Dialog):
         label = wx.StaticText(parent, -1, 'The feed link will launch in your browser if you click on the feed title in a pop-up window.')
         label.Wrap(300)
         sizer.Add(label, (4, 1), (1, 2), flag=wx.ALIGN_CENTER_VERTICAL)
-        label = wx.StaticText(parent, -1, 'The polling interval specifies how often the application will check the feed for new items.')
+        label = wx.StaticText(parent, -1, 'The polling interval specifies how often the application will check the feed for new items. When adding a new feed, the application automatically fills this in by examining the items in the feed.')
         label.Wrap(300)
         sizer.Add(label, (6, 1), (1, 2), flag=wx.ALIGN_CENTER_VERTICAL)
         return sizer
@@ -318,7 +320,12 @@ class EditFeedDialog(wx.Dialog):
         interval = int(self.interval.GetValue())
         multiplier = self.units.GetClientData(self.units.GetSelection())
         interval = interval * multiplier
-        # TODO: warning if < 60 seconds
+        if interval < 60:
+            dialog = wx.MessageDialog(self, 'Are you sure you want to check this feed every %d second(s)?\n\nYou might make the website administrator unhappy!' % interval, 'Confirm Polling Interval', wx.YES_NO|wx.NO_DEFAULT|wx.ICON_QUESTION)
+            result = dialog.ShowModal()
+            dialog.Destroy()
+            if result == wx.ID_NO:
+                return
         self.feed.title = title
         self.feed.link = link
         self.feed.interval = interval

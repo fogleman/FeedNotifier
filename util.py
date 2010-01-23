@@ -1,7 +1,9 @@
 import wx
 import re
 import time
+import calendar
 from htmlentitydefs import name2codepoint
+from settings import settings
 
 def menu_item(menu, label, func, icon=None, kind=wx.ITEM_NORMAL):
     item = wx.MenuItem(menu, -1, label, kind=kind)
@@ -18,6 +20,34 @@ def select_choice(choice, data):
             choice.Select(index)
             return
     choice.Select(wx.NOT_FOUND)
+    
+def guess_polling_interval(entries):
+    if len(entries) < 2:
+        return settings.DEFAULT_POLLING_INTERVAL
+    timestamps = []
+    for entry in entries:
+        timestamp = calendar.timegm(entry.get('date_parsed', time.gmtime()))
+        timestamps.append(timestamp)
+    timestamps.sort()
+    durations = [b - a for a, b in zip(timestamps, timestamps[1:])]
+    mean = sum(durations) / len(durations)
+    choices = [
+        30,
+        60,
+        60*5,
+        60*15,
+        60*30,
+        60*60,
+        60*60*4,
+        60*60*12,
+        60*60*24,
+    ]
+    desired = mean / 2
+    if desired < 30:
+        interval = 30
+    else:
+        interval = max(choice for choice in choices if choice <= desired)
+    return interval
     
 def time_since(t):
     t = int(t)
