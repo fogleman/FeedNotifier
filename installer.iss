@@ -24,6 +24,7 @@ SolidCompression=yes
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
+Name: "startupicon"; Description: "Run Feed Notifier on Startup"; GroupDescription: "Additional tasks:";
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 Name: "quicklaunchicon"; Description: "{cm:CreateQuickLaunchIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
@@ -41,9 +42,11 @@ Source: "dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createal
 [Icons]
 Name: "{group}\Feed Notifier"; Filename: "{app}\notifier.exe"; WorkingDir: "{app}";
 Name: "{group}\{cm:UninstallProgram,Feed Notifier}"; Filename: "{uninstallexe}"
-Name: "{commondesktop}\Feed Notifier"; Filename: "{app}\notifier.exe"; WorkingDir: "{app}"; Tasks: desktopicon
+Name: "{userdesktop}\Feed Notifier"; Filename: "{app}\notifier.exe"; WorkingDir: "{app}"; Tasks: desktopicon
 Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\Feed Notifier"; Filename: "{app}\notifier.exe"; WorkingDir: "{app}"; Tasks: quicklaunchicon
+Name: "{userstartup}\Feed Notifier"; Filename: "{app}\notifier.exe"; WorkingDir: "{app}"; Tasks: startupicon
 
 [Run]
 Filename: "{app}\notifier.exe"; Description: "{cm:LaunchProgram,Feed Notifier}"; Flags: nowait postinstall skipifsilent
+
 
