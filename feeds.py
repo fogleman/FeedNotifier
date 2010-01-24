@@ -5,6 +5,7 @@ import calendar
 import uuid
 import urlparse
 import urllib2
+import random
 import util
 import cPickle as pickle
 from settings import settings
@@ -147,7 +148,9 @@ class FeedManager(object):
     def should_poll(self):
         return any(feed.should_poll() for feed in self.feeds)
     def poll(self):
-        for feed in self.feeds:
+        feeds = list(self.feeds)
+        random.shuffle(feeds)
+        for feed in feeds:
             if not feed.should_poll():
                 continue
             items = feed.poll()
