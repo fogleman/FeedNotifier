@@ -59,12 +59,12 @@ class Controller(object):
         thread.start()
     def _poll_thread(self):
         try:
-            new_items = self.manager.poll()
-            wx.CallAfter(self._poll_complete, new_items)
+            for new_items in self.manager.poll():
+                wx.CallAfter(self._poll_result, new_items)
+            wx.CallAfter(self._poll_complete)
         finally:
             self.polling = False
-    def _poll_complete(self, new_items):
-        self.frame.icon.set_icon('icons/feed.png')
+    def _poll_result(self, new_items):
         if not new_items:
             return
         items = self.manager.items
@@ -74,6 +74,8 @@ class Controller(object):
             index = len(items)
         items.extend(new_items)
         self.show_items(items, index)
+    def _poll_complete(self):
+        self.frame.icon.set_icon('icons/feed.png')
     def force_poll(self):
         for feed in self.manager.feeds:
             feed.last_poll = 0

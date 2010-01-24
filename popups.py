@@ -76,10 +76,10 @@ class PopupManager(wx.EvtHandler):
         self.auto = settings.POPUP_AUTO_PLAY
         self.cache = {}
     def set_items(self, items, index=0):
-        self.clear_cache()
         self.items = list(items)
         self.index = index
         self.count = len(self.items)
+        self.clear_cache(keep_current_item=True)
         self.update()
         self.set_timer()
     def update(self):
@@ -109,8 +109,11 @@ class PopupManager(wx.EvtHandler):
             if item not in items:
                 frame.Close()
                 del self.cache[item]
-    def clear_cache(self):
+    def clear_cache(self, keep_current_item=False):
+        current_item = self.items[self.index]
         for item, frame in self.cache.items():
+            if keep_current_item and item == current_item:
+                continue
             frame.Close()
             del self.cache[item]
     def show_frame(self):
@@ -193,17 +196,15 @@ class PopupManager(wx.EvtHandler):
         self.index = self.count - 1
         self.update()
     def on_next(self):
-        self.index += 1
-        if self.index >= self.count:
-            #self.index = self.count - 1
-            self.on_close()
-        else:
+        if self.index < self.count - 1:
+            self.index += 1
             self.update()
+        else:
+            self.on_close()
     def on_previous(self):
-        self.index -= 1
-        if self.index < 0:
-            self.index = 0
-        self.update()
+        if self.index > 0:
+            self.index -= 1
+            self.update()
     def on_close(self):
         self.stop_timer()
         self.clear_cache()

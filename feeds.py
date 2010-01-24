@@ -69,6 +69,8 @@ class Feed(object):
     def clear_cache(self):
         self.id_list = []
         self.id_set = set()
+        self.etag = None
+        self.modified = None
     def clean_cache(self, size):
         for id in self.id_list[:-size]:
             self.id_set.remove(id)
@@ -117,13 +119,14 @@ class FeedManager(object):
     def should_poll(self):
         return any(feed.should_poll() for feed in self.feeds)
     def poll(self):
-        all_items = []
         for feed in self.feeds:
-            if feed.should_poll():
-                items = feed.poll()
-                all_items.extend(items)
-        all_items.sort(cmp=cmp_timestamp)
-        return all_items
+            if not feed.should_poll():
+                continue
+            items = feed.poll()
+            if not items:
+                continue
+            items.sort(cmp=cmp_timestamp)
+            yield items
     def purge_items(self, max_age):
         now = int(time.time())
         for item in list(self.items):
