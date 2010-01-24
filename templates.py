@@ -10,12 +10,18 @@ def create_env():
     return env
     
 def render(theme, item, context=None):
+    feed = item.feed
     reldir = 'themes/%s' % theme
     absdir = os.path.abspath(reldir)
     cssdir = 'file:///%s' % absdir.replace('\\', '/')
+    if feed.has_favicon:
+        icon = feed.favicon_path
+    else:
+        icon = os.path.abspath('icons/feed.png')
     context = context or {}
     context['item'] = item
-    context['feed'] = item.feed
+    context['feed'] = feed
+    context['icon'] = icon
     context['reldir'] = reldir
     context['absdir'] = absdir
     context['cssdir'] = cssdir

@@ -1,8 +1,10 @@
 import feedparser
+import os
 import time
 import calendar
 import uuid
 import urlparse
+import urllib2
 import util
 import cPickle as pickle
 from settings import settings
@@ -63,9 +65,28 @@ class Feed(object):
             setattr(self, key, value)
     @property
     def favicon_url(self):
-        components = urlparse.urlsplit(self.url)
+        components = urlparse.urlsplit(self.link)
         scheme, domain = components[:2]
         return '%s://%s/favicon.ico' % (scheme, domain)
+    @property
+    def favicon_path(self):
+        components = urlparse.urlsplit(self.link)
+        scheme, domain = components[:2]
+        path = 'icons/cache/%s.ico' % domain
+        return os.path.abspath(path)
+    @property
+    def has_favicon(self):
+        return os.path.exists(self.favicon_path)
+    def download_favicon(self):
+        try:
+            f = urllib2.urlopen(self.favicon_url)
+            data = f.read()
+            f.close()
+            f = open(self.favicon_path, 'wb')
+            f.write(data)
+            f.close()
+        except Exception:
+            pass
     def clear_cache(self):
         self.id_list = []
         self.id_set = set()
@@ -125,6 +146,8 @@ class FeedManager(object):
             items = feed.poll()
             if not items:
                 continue
+            if not feed.has_favicon:
+                feed.download_favicon()
             items.sort(cmp=cmp_timestamp)
             yield items
     def purge_items(self, max_age):
