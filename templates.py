@@ -12,11 +12,13 @@ def create_env():
 def render(theme, item, context=None):
     reldir = 'themes/%s' % theme
     absdir = os.path.abspath(reldir)
+    cssdir = 'file:///%s' % absdir.replace('\\', '/')
     context = context or {}
     context['item'] = item
     context['feed'] = item.feed
     context['reldir'] = reldir
     context['absdir'] = absdir
+    context['cssdir'] = cssdir
     try:
         template = 'themes/%s/index.html' % theme
         template = env.get_template(template)
