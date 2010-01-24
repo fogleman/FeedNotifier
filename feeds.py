@@ -78,6 +78,13 @@ class Feed(object):
     def has_favicon(self):
         return os.path.exists(self.favicon_path)
     def download_favicon(self):
+        # make cache directory if needed
+        try:
+            dir, name = os.path.split(self.favicon_path)
+            os.makedirs(dir)
+        except Exception:
+            pass
+        # try to download the favicon
         try:
             f = urllib2.urlopen(self.favicon_url)
             data = f.read()
