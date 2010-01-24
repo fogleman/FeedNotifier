@@ -367,9 +367,9 @@ class Model(object):
         def cmp_interval(a, b):
             return cmp(a.interval, b.interval)
         def cmp_title(a, b):
-            return cmp(a.title, b.title)
+            return cmp(a.title.lower(), b.title.lower())
         def cmp_url(a, b):
-            return cmp(a.url, b.url)
+            return cmp(a.url.lower(), b.url.lower())
         funcs = {
             0: cmp_enabled,
             1: cmp_interval,
