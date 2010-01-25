@@ -4,9 +4,16 @@ import feeds
 import popups
 import view
 import threading
+import socket
 from settings import settings
 
 WELCOME_FEED_URL = 'http://www.feed-notifier.com/welcome.xml'
+
+INVALID_ADDRESSES = [
+    '127.0.0',
+    '169.254',
+    '0.0.0.0',
+]
 
 class Controller(object):
     def __init__(self):
@@ -52,6 +59,11 @@ class Controller(object):
             return
         if not self.manager.should_poll():
             return
+        # make sure we're online
+        address = socket.gethostbyname(socket.gethostname())
+        for invalid in INVALID_ADDRESSES:
+            if address.startswith(invalid):
+                return
         self.polling = True
         self.frame.icon.set_icon('icons/feed_go.png')
         thread = threading.Thread(target=self._poll_thread)
