@@ -69,7 +69,7 @@ class AddFeedDialog(wx.Dialog):
             window.Destroy()
             if result != wx.ID_OK:
                 return None
-            url = data.href
+            url = data.original_url
             entries = data.get('entries', [])
             feed = feeds.Feed(url)
             feed.title = data.feed.title
@@ -183,6 +183,7 @@ class AddFeedDialog(wx.Dialog):
         if not self: # cancelled
             return
         if d['entries']:
+            d['original_url'] = url
             wx.CallAfter(self.on_valid, d)
         else:
             wx.CallAfter(self.on_invalid)
