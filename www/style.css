@@ -1,13 +1,96 @@
+a img {
+    border: none;
+}
+
 body {
-    font-family: Tahoma, Arial, sans-serif;
-    margin: 25px 75px;
+    margin: 15px 25px;
     padding: 0;
+    font-family: Tahoma, Arial, sans-serif;
 }
 
-li {
-    line-height: 133%;
+.clear {
+    clear: both;
 }
 
-img {
+#container {
+    background: url('images/sidebar.png') repeat-y;
+}
+
+#sidebar {
+    width: 160px;
+    float: left;
+}
+
+#logo img {
+    margin: 10px 30px;
+}
+
+#title h3 {
+    margin: 0;
+    margin-left: 15px;
+    margin-bottom: 4px;
+}
+
+#title a {
+    color: #000;
+    text-decoration: none;
+}
+
+#title a:hover {
+    text-decoration: underline;
+}
+
+#subtitle p {
+    margin: 0;
+    margin-left: 15px;
+    font-size: 9pt;
+}
+
+#menu {
+    margin: 10px 0;
+}
+
+#menu ul {
+    list-style: none;
+    margin: 0 10px;
+    padding: 10px 10px;
+    border-top: 3px solid #aaa;
+    border-bottom: 3px solid #aaa;
+}
+
+#menu li {
+    margin: 0;
+    padding: 0;
+    line-height: 200%;
+    font-weight: bold;
+}
+
+#menu a {
+    color: #00f;
+    text-decoration: none;
+}
+
+#menu a:hover {
+    text-decoration: underline;
+}
+
+#body {
+    margin-left: 175px;
+    max-width: 800px;
+    border: 1px solid #ccc;
+}
+
+#content {
+    margin: 15px 25px;
+}
+
+#content p, #content ul {
+    font-family: Arial;
+    font-size: 11pt;
+    line-height: 150%;
+}
+
+#content img {
     vertical-align: middle;
+    padding: 1px;
 }
