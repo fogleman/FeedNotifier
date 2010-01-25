@@ -5,13 +5,13 @@ import templates
 from settings import settings
 
 BLANK = 'about:blank'
-COMMAND_CLOSE = 'feednotifier://close/'
-COMMAND_NEXT = 'feednotifier://next/'
-COMMAND_PREVIOUS = 'feednotifier://previous/'
-COMMAND_FIRST = 'feednotifier://first/'
-COMMAND_LAST = 'feednotifier://last/'
-COMMAND_PLAY = 'feednotifier://play/'
-COMMAND_PAUSE = 'feednotifier://pause/'
+COMMAND_CLOSE = 'http://close/'
+COMMAND_NEXT = 'http://next/'
+COMMAND_PREVIOUS = 'http://previous/'
+COMMAND_FIRST = 'http://first/'
+COMMAND_LAST = 'http://last/'
+COMMAND_PLAY = 'http://play/'
+COMMAND_PAUSE = 'http://pause/'
 
 class Event(wx.PyEvent):
     def __init__(self, event_object, type):
