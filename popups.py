@@ -82,14 +82,14 @@ class PopupManager(wx.EvtHandler):
         self.clear_cache(keep_current_item=True)
         self.update()
         self.set_timer()
-    def update(self):
+    def update(self, focus=False):
         item = self.items[self.index]
         if item in self.cache:
-            self.show_frame()
+            self.show_frame(focus)
             self.update_cache()
         else:
             self.update_cache(True)
-            self.show_frame()
+            self.show_frame(focus)
             self.update_cache()
     def update_cache(self, current_only=False):
         indexes = set()
@@ -116,14 +116,17 @@ class PopupManager(wx.EvtHandler):
                 continue
             frame.Close()
             del self.cache[item]
-    def show_frame(self):
+    def show_frame(self, focus=False):
         current_item = self.items[self.index]
         current_item.read = True
         for item, frame in self.cache.items():
             if item == current_item:
-                frame.Disable()
-                frame.Show()
-                frame.Enable()
+                if focus:
+                    frame.Show()
+                else:
+                    frame.Disable()
+                    frame.Show()
+                    frame.Enable()
                 frame.Update()
         for item, frame in self.cache.items():
             if item != current_item:
@@ -191,20 +194,20 @@ class PopupManager(wx.EvtHandler):
             webbrowser.open(link)
     def on_first(self):
         self.index = 0
-        self.update()
+        self.update(True)
     def on_last(self):
         self.index = self.count - 1
-        self.update()
-    def on_next(self):
+        self.update(True)
+    def on_next(self, focus=True):
         if self.index < self.count - 1:
             self.index += 1
-            self.update()
+            self.update(focus)
         else:
             self.on_close()
     def on_previous(self):
         if self.index > 0:
             self.index -= 1
-            self.update()
+            self.update(True)
     def on_close(self):
         self.stop_timer()
         self.clear_cache()
@@ -217,6 +220,6 @@ class PopupManager(wx.EvtHandler):
         if self.index == self.count - 1:
             self.on_close()
         else:
-            self.on_next()
+            self.on_next(False)
             self.set_timer()
             
