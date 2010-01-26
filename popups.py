@@ -41,8 +41,8 @@ class BrowserControl(ie.IEHtmlWindow):
         
 class PopupFrame(wx.Frame):
     def __init__(self):
+        title = settings.APP_NAME
         style = wx.STAY_ON_TOP | wx.FRAME_NO_TASKBAR | wx.BORDER_NONE
-        title = 'Feed Notifier'
         super(PopupFrame, self).__init__(None, -1, title, style=style)
         self.SetTransparent(settings.POPUP_TRANSPARENCY)
         self.control = BrowserControl(self)

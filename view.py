@@ -29,7 +29,7 @@ class TaskBarIcon(wx.TaskBarIcon):
         return menu
     def set_icon(self, path):
         icon = wx.IconFromBitmap(wx.Bitmap(path))
-        self.SetIcon(icon, 'Feed Notifier')
+        self.SetIcon(icon, settings.APP_NAME)
     def on_event(self, event):
         print event
     def on_exit(self, event):
@@ -49,7 +49,7 @@ class TaskBarIcon(wx.TaskBarIcon):
         
 class HiddenFrame(wx.Frame):
     def __init__(self, controller):
-        super(HiddenFrame, self).__init__(None, -1, 'Feed Notifier')
+        super(HiddenFrame, self).__init__(None, -1, settings.APP_NAME)
         self.controller = controller
         self.icon = TaskBarIcon(controller)
         self.Bind(wx.EVT_CLOSE, self.on_close)
@@ -184,7 +184,7 @@ class AddFeedDialog(wx.Dialog):
         self.url.SelectAll()
         self.url.SetFocus()
     def check_feed(self, url):
-        d = feedparser.parse(url, handlers=util.get_proxy())
+        d = feedparser.parse(url, agent=settings.USER_AGENT, handlers=util.get_proxy())
         if not self: # cancelled
             return
         if d['entries']:
@@ -392,8 +392,9 @@ class Model(object):
             
 class SettingsDialog(wx.Dialog):
     def __init__(self, parent, controller):
+        title = '%s Preferences' % settings.APP_NAME
         style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-        super(SettingsDialog, self).__init__(parent, -1, 'Feed Notifier Preferences', style=style)
+        super(SettingsDialog, self).__init__(parent, -1, title, style=style)
         #self.SetIcon(wx.IconFromBitmap(wx.Bitmap('icons/feed.png')))
         self.model = Model(controller)
         panel = self.create_panel(self)
