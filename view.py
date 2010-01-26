@@ -424,6 +424,7 @@ class SettingsDialog(wx.Dialog):
         notebook.AddPage(about, 'About', imageId=3)
         self.popups = popups
         self.options = options
+        notebook.Fit()
         return notebook
     def create_buttons(self, parent):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -474,7 +475,6 @@ class FeedsList(wx.ListCtrl):
         self.SetColumnWidth(1, 100)
         self.SetColumnWidth(2, 180)
         self.SetColumnWidth(3, 180)
-        self.SetMinSize((500, 250))
         self.Bind(wx.EVT_LEFT_DOWN, self.on_left_down)
         self.Bind(wx.EVT_LIST_COL_CLICK, self.on_col_click)
         self.update()
@@ -614,8 +614,8 @@ class PopupsPanel(wx.Panel):
         line = wx.StaticLine(self, -1)
         sizer.Add(line, 0, wx.EXPAND)
         sizer.Add(panel, 1, wx.EXPAND|wx.ALL, 8)
-        self.SetSizerAndFit(sizer)
         self.update_controls()
+        self.SetSizerAndFit(sizer)
     def create_panel(self, parent):
         panel = wx.Panel(parent, -1)
         sizer = wx.BoxSizer(wx.VERTICAL)
@@ -753,16 +753,19 @@ class OptionsPanel(wx.Panel):
         line = wx.StaticLine(self, -1)
         sizer.Add(line, 0, wx.EXPAND)
         sizer.Add(panel, 1, wx.EXPAND|wx.ALL, 8)
-        self.SetSizerAndFit(sizer)
         self.update_controls()
+        self.SetSizerAndFit(sizer)
     def create_panel(self, parent):
         panel = wx.Panel(parent, -1)
         sizer = wx.BoxSizer(wx.VERTICAL)
         polling = self.create_polling(panel)
         caching = self.create_caching(panel)
+        proxy = self.create_proxy(panel)
         sizer.Add(polling, 0, wx.EXPAND)
         sizer.AddSpacer(8)
         sizer.Add(caching, 0, wx.EXPAND)
+        sizer.AddSpacer(8)
+        sizer.Add(proxy, 0, wx.EXPAND)
         panel.SetSizerAndFit(sizer)
         return panel
     def create_polling(self, parent):
@@ -822,6 +825,26 @@ class OptionsPanel(wx.Panel):
         self.clear_item = clear_item
         self.clear_feed = clear_feed
         return sizer
+    def create_proxy(self, parent):
+        box = wx.StaticBox(parent, -1, 'Proxy')
+        sizer = wx.StaticBoxSizer(box, wx.VERTICAL)
+        grid = wx.GridBagSizer(8, 8)
+        
+        use_proxy = wx.CheckBox(parent, -1, 'Use a proxy server')
+        grid.Add(use_proxy, (0, 0), flag=wx.ALIGN_CENTER_VERTICAL)
+        proxy_url = wx.TextCtrl(parent, -1)
+        grid.Add(proxy_url, (1, 0), flag=wx.EXPAND)
+        text = wx.StaticText(parent, -1, 'Format: http://<username>:<password>@<proxyserver>:<proxyport>')
+        grid.Add(text, (2, 0), flag=wx.ALIGN_CENTER_VERTICAL)
+        
+        sizer.Add(grid, 1, wx.EXPAND|wx.ALL, 8)
+        
+        use_proxy.Bind(wx.EVT_CHECKBOX, self.on_change)
+        proxy_url.Bind(wx.EVT_TEXT, self.on_change)
+        
+        self.use_proxy = use_proxy
+        self.proxy_url = proxy_url
+        return sizer
     def update_controls(self):
         model = self.model
         self.idle.SetValue(model.DISABLE_WHEN_IDLE)
@@ -829,6 +852,9 @@ class OptionsPanel(wx.Panel):
         one_day = 60 * 60 * 24
         self.item.SetValue(model.ITEM_CACHE_AGE / one_day)
         self.feed.SetValue(model.FEED_CACHE_SIZE)
+        self.use_proxy.SetValue(model.USE_PROXY)
+        self.proxy_url.ChangeValue(model.PROXY_URL)
+        self.enable_controls()
     def update_model(self):
         model = self.model
         model.DISABLE_WHEN_IDLE = self.idle.GetValue()
@@ -836,7 +862,13 @@ class OptionsPanel(wx.Panel):
         one_day = 60 * 60 * 24
         model.ITEM_CACHE_AGE = self.item.GetValue() * one_day
         model.FEED_CACHE_SIZE = self.feed.GetValue()
+        model.USE_PROXY = self.use_proxy.GetValue()
+        model.PROXY_URL = self.proxy_url.GetValue()
+    def enable_controls(self):
+        self.timeout.Enable(self.idle.GetValue())
+        self.proxy_url.Enable(self.use_proxy.GetValue())
     def on_change(self, event):
+        self.enable_controls()
         self.dialog.on_change()
         event.Skip()
     def on_clear_item(self, event):

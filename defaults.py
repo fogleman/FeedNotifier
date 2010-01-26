@@ -17,4 +17,4 @@ FEED_CACHE_SIZE = 1000
 
 # Proxy Settings
 USE_PROXY = False
-PROXY_URL = 'http://<username>:<password>@<proxyserver>:<proxyport>'
+PROXY_URL = ''
