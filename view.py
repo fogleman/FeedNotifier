@@ -179,7 +179,7 @@ class AddFeedDialog(wx.Dialog):
         self.url.SelectAll()
         self.url.SetFocus()
     def check_feed(self, url):
-        d = feedparser.parse(url)
+        d = feedparser.parse(url, handlers=util.get_proxy())
         if not self: # cancelled
             return
         if d['entries']:

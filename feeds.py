@@ -113,7 +113,7 @@ class Feed(object):
     def poll(self):
         result = []
         self.last_poll = int(time.time())
-        d = feedparser.parse(self.url, etag=self.etag, modified=self.modified)
+        d = feedparser.parse(self.url, etag=self.etag, modified=self.modified, handlers=util.get_proxy())
         self.etag = d.get('etag', None)
         self.modified = d.get('modified', None)
         feed = d.get('feed', None)

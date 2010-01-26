@@ -3,6 +3,7 @@ import os
 import re
 import time
 import calendar
+import urllib2
 from htmlentitydefs import name2codepoint
 from settings import settings
 
@@ -22,6 +23,16 @@ def select_choice(choice, data):
             return
     choice.Select(wx.NOT_FOUND)
     
+def get_proxy():
+    if settings.USE_PROXY:
+        map = {
+            'http': settings.PROXY_URL,
+        }
+        proxy = urllib2.ProxyHandler(map)
+        return [proxy]
+    else:
+        return []
+        
 def find_themes():
     result = []
     names = os.listdir('themes')
