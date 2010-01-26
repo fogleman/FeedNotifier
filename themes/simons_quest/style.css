@@ -1,0 +1,46 @@
+@font-face {
+    font-family:'pixelette';
+    src:url('{{cssdir}}/pixelette.eot');
+    src: local('pixelette'), url('{{cssdir}}/pixelette.ttf') format('truetype');
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    cursor: default;
+    font-family: pixelette;
+}
+
+#icon {
+    margin: 8px;
+    float: left;
+}
+
+#icon img {
+    border: 0;
+    filter:progid:DXImageTransform.Microsoft.Pixelate(maxsquare=4);
+}
+
+#item-title {
+    font-size: 18px;
+    margin-bottom: 6px;
+    color: #ffffff;
+    float: left;
+}
+
+#item-title a {
+    text-decoration: none;
+    color: #0056ff;
+}
+
+#item-description {
+    clear:both;
+    font-size: 12px;
+    margin: 4px;
+}
+
+#footer #next {
+    border: 0;
+    float: right;
+    margin-right: 8px;
+}
