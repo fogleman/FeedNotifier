@@ -1,4 +1,5 @@
 import wx
+import wx.lib.iewin as ie
 import util
 import feeds
 import threading
@@ -53,6 +54,10 @@ class HiddenFrame(wx.Frame):
         self.icon = TaskBarIcon(controller)
         self.Bind(wx.EVT_CLOSE, self.on_close)
         self.CenterOnScreen()
+        # pre-load IE
+        control = ie.IEHtmlWindow(self, -1)
+        control.LoadString('<html></html>')
+        control.Destroy()
     def on_close(self, event):
         event.Skip()
         wx.CallAfter(self.icon.Destroy)
