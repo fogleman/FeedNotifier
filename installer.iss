@@ -34,8 +34,13 @@ Type: files; Name: "{app}\msvcp71.dll"
 Type: files; Name: "{app}\MSVCR71.dll"
 Type: files; Name: "{app}\notifier.exe.manifest"
 
+[Dirs]
+Name: "{app}"; Permissions: everyone-modify
+
 [Files]
-Source: "dist\notifier.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "dist\notifier.exe"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-readexec
+Source: "dist\w9xpopen.exe"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-readexec
+Source: "dist\library.zip"; DestDir: "{app}"; Flags: ignoreversion; Permissions: everyone-readexec
 Source: "dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 

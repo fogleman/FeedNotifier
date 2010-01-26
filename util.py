@@ -44,19 +44,21 @@ def guess_polling_interval(entries):
     durations = [b - a for a, b in zip(timestamps, timestamps[1:])]
     mean = sum(durations) / len(durations)
     choices = [
-        30,
         60,
         60*5,
+        60*10,
         60*15,
         60*30,
         60*60,
+        60*60*2,
         60*60*4,
+        60*60*8,
         60*60*12,
         60*60*24,
     ]
     desired = mean / 2
-    if desired < 30:
-        interval = 30
+    if desired < choices[0]:
+        interval = choices[0]
     else:
         interval = max(choice for choice in choices if choice <= desired)
     return interval
