@@ -30,7 +30,7 @@ class Controller(object):
             return
         feed = feeds.Feed(WELCOME_FEED_URL)
         feed.interval = 60 * 60 * 24
-        self.manager.feeds.append(feed)
+        self.manager.add_feed(feed)
     def parse_args(self, message):
         urls = message.split('\n')
         for url in urls:
@@ -45,6 +45,8 @@ class Controller(object):
     def disable(self):
         self.frame.icon.set_icon('icons/feed_delete.png')
         self.enabled = False
+    def save(self):
+        self.manager.save()
     def on_poll(self):
         try:
             self.poll()
@@ -71,14 +73,14 @@ class Controller(object):
         thread.start()
     def _poll_thread(self):
         try:
+            found_new = False
             for new_items in self.manager.poll():
+                found_new = True
                 wx.CallAfter(self._poll_result, new_items)
-            wx.CallAfter(self._poll_complete)
+            wx.CallAfter(self._poll_complete, found_new)
         finally:
             self.polling = False
     def _poll_result(self, new_items):
-        if not new_items:
-            return
         items = self.manager.items
         if self.popup:
             index = self.popup.index
@@ -86,7 +88,9 @@ class Controller(object):
             index = len(items)
         items.extend(new_items)
         self.show_items(items, index)
-    def _poll_complete(self):
+    def _poll_complete(self, found_new):
+        if found_new:
+            self.save()
         self.frame.icon.set_icon('icons/feed.png')
     def force_poll(self):
         for feed in self.manager.feeds:
@@ -109,7 +113,8 @@ class Controller(object):
         feed = view.AddFeedDialog.show_wizard(self.frame, url)
         if not feed:
             return
-        self.manager.feeds.append(feed)
+        self.manager.add_feed(feed)
+        self.save()
         self.poll()
     def edit_settings(self):
         window = view.SettingsDialog(self.frame, self)

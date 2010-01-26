@@ -141,10 +141,10 @@ class FeedManager(object):
     def __init__(self):
         self.feeds = []
         self.items = []
-    def add_url(self, url):
-        feed = Feed(url)
+    def add_feed(self, feed):
         self.feeds.append(feed)
-        return feed
+    def remove_feed(self, feed):
+        self.feeds.remove(feed)
     def should_poll(self):
         return any(feed.should_poll() for feed in self.feeds)
     def poll(self):

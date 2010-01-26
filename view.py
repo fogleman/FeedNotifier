@@ -56,7 +56,7 @@ class HiddenFrame(wx.Frame):
     def on_close(self, event):
         event.Skip()
         wx.CallAfter(self.icon.Destroy)
-        self.controller.manager.save()
+        self.controller.save()
         
 class AddFeedDialog(wx.Dialog):
     @staticmethod
@@ -336,6 +336,7 @@ class Model(object):
     def apply(self):
         self.apply_feeds()
         self.apply_settings()
+        self.controller.save()
     def apply_settings(self):
         for key, value in self.settings.items():
             setattr(settings, key, value)
@@ -354,10 +355,10 @@ class Model(object):
         same = after_set & before_set
         for uuid in added:
             feed = after[uuid]
-            controller.manager.feeds.append(feed)
+            controller.manager.add_feed(feed)
         for uuid in deleted:
             feed = before[uuid]
-            controller.manager.feeds.remove(feed)
+            controller.manager.remove_feed(feed)
         for uuid in same:
             a = before[uuid]
             b = after[uuid]
