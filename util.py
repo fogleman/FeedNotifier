@@ -23,6 +23,11 @@ def select_choice(choice, data):
             return
     choice.Select(wx.NOT_FOUND)
     
+def abspath(path):
+    path = os.path.abspath(path)
+    path = 'file:///%s' % path.replace('\\', '/')
+    return path
+    
 def get_proxy():
     if settings.USE_PROXY:
         map = {

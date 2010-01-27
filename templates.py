@@ -1,5 +1,6 @@
 import os
 import jinja2 as jinja
+import util
 
 DEFAULT_THEME = 'default'
 
@@ -12,12 +13,11 @@ def create_env():
 def render(theme, item, context=None):
     feed = item.feed
     reldir = 'themes/%s' % theme
-    absdir = os.path.abspath(reldir)
-    absdir = 'file:///%s' % absdir.replace('\\', '/')
+    absdir = util.abspath(reldir)
     if feed.has_favicon:
-        icon = feed.favicon_path
+        icon = util.abspath(feed.favicon_path)
     else:
-        icon = os.path.abspath('icons/feed.png')
+        icon = util.abspath('icons/feed.png')
     context = context or {}
     context['item'] = item
     context['feed'] = feed
