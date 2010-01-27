@@ -2,12 +2,12 @@
 {% block body %}
 <table border="0" cellpadding="0" cellspacing="0" width="{{POPUP_WIDTH}}">
     <tr>
-        <td width="8" height="8" style="background:url('{{cssdir}}/top_left.png'); no-repeat;"/>
-        <td height="8" style="background:url('{{cssdir}}/horizontal.png'); repeat-y;"/>
-        <td width="8" height="8" style="background:url('{{cssdir}}/top_right.png'); no-repeat;"/>
+        <td width="8" height="8" style="background:url('{{absdir}}/top_left.png'); no-repeat;"/>
+        <td height="8" style="background:url('{{absdir}}/horizontal.png'); repeat-y;"/>
+        <td width="8" height="8" style="background:url('{{absdir}}/top_right.png'); no-repeat;"/>
     </tr>
     <tr>
-        <td width="8" style="background:url('{{cssdir}}/vertical.png'); repeat-y;"/>
+        <td width="8" style="background:url('{{absdir}}/vertical.png'); repeat-y;"/>
             
             <!-- START ACTUAL CONTENT -->
             <td style="background:black; color:#ffffff">
@@ -24,12 +24,12 @@
             <!-- END ACTUAL CONTENT -->
 
 
-        <td width="8" style="background:url('{{cssdir}}/vertical.png'); repeat-y;"/>
+        <td width="8" style="background:url('{{absdir}}/vertical.png'); repeat-y;"/>
     </tr>
     <tr>
-        <td width="8" height="8" style="background:url('{{cssdir}}/bottom_left.png'); no-repeat;"/>
-        <td height="8" style="background:url('{{cssdir}}/horizontal.png'); repeat-x;"/>
-        <td width="8" height="8" style="background:url('{{cssdir}}/bottom_right.png'); no-repeat;"/>
+        <td width="8" height="8" style="background:url('{{absdir}}/bottom_left.png'); no-repeat;"/>
+        <td height="8" style="background:url('{{absdir}}/horizontal.png'); repeat-x;"/>
+        <td width="8" height="8" style="background:url('{{absdir}}/bottom_right.png'); no-repeat;"/>
     </tr>
 </table>
 {% endblock %}

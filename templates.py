@@ -13,7 +13,7 @@ def render(theme, item, context=None):
     feed = item.feed
     reldir = 'themes/%s' % theme
     absdir = os.path.abspath(reldir)
-    cssdir = 'file:///%s' % absdir.replace('\\', '/')
+    absdir = 'file:///%s' % absdir.replace('\\', '/')
     if feed.has_favicon:
         icon = feed.favicon_path
     else:
@@ -24,7 +24,6 @@ def render(theme, item, context=None):
     context['icon'] = icon
     context['reldir'] = reldir
     context['absdir'] = absdir
-    context['cssdir'] = cssdir
     try:
         template = 'themes/%s/index.html' % theme
         template = env.get_template(template)

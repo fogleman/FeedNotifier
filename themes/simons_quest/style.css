@@ -1,7 +1,7 @@
 @font-face {
     font-family:'pixelette';
-    src:url('{{cssdir}}/pixelette.eot');
-    src: local('pixelette'), url('{{cssdir}}/pixelette.ttf') format('truetype');
+    src:url('{{absdir}}/pixelette.eot');
+    src: local('pixelette'), url('{{absdir}}/pixelette.ttf') format('truetype');
 }
 
 body {
