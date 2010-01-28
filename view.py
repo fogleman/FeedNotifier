@@ -524,7 +524,7 @@ class FeedsList(wx.ListCtrl):
         if column == INDEX_INTERVAL:
             return util.split_time_str(feed.interval)
         if column == INDEX_CLICKS:
-            return str(feed.clicks)
+            return str(feed.clicks) if feed.clicks else ''
         return ''
         
 class FeedsPanel(wx.Panel):
