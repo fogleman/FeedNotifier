@@ -6,6 +6,12 @@ import threading
 import feedparser
 from settings import settings
 
+INDEX_ENABLED = 0
+INDEX_URL = 1
+INDEX_TITLE = 2
+INDEX_INTERVAL = 3
+INDEX_CLICKS = 4
+
 class TaskBarIcon(wx.TaskBarIcon):
     def __init__(self, controller):
         super(TaskBarIcon, self).__init__()
@@ -371,6 +377,8 @@ class Model(object):
     def sort_feeds(self, column):
         def cmp_enabled(a, b):
             return cmp(a.enabled, b.enabled)
+        def cmp_clicks(a, b):
+            return cmp(b.clicks, a.clicks)
         def cmp_interval(a, b):
             return cmp(a.interval, b.interval)
         def cmp_title(a, b):
@@ -378,10 +386,11 @@ class Model(object):
         def cmp_url(a, b):
             return cmp(a.url.lower(), b.url.lower())
         funcs = {
-            0: cmp_enabled,
-            1: cmp_interval,
-            2: cmp_title,
-            3: cmp_url,
+            INDEX_ENABLED: cmp_enabled,
+            INDEX_URL: cmp_url,
+            INDEX_TITLE: cmp_title,
+            INDEX_INTERVAL: cmp_interval,
+            INDEX_CLICKS: cmp_clicks,
         }
         self.feeds.sort(cmp=funcs[column])
         if column == self._sort_column:
@@ -473,17 +482,19 @@ class FeedsList(wx.ListCtrl):
         images.AddWithColourMask(wx.Bitmap('icons/unchecked.png'), wx.WHITE)
         images.AddWithColourMask(wx.Bitmap('icons/checked.png'), wx.WHITE)
         self.AssignImageList(images, wx.IMAGE_LIST_SMALL)
-        self.InsertColumn(0, 'Enabled')
-        self.InsertColumn(1, 'Interval')
-        self.InsertColumn(2, 'Feed Title')
-        self.InsertColumn(3, 'Feed URL')
-        self.SetColumnWidth(0, -2)
-        self.SetColumnWidth(1, 100)
-        self.SetColumnWidth(2, 180)
-        self.SetColumnWidth(3, 180)
+        self.InsertColumn(INDEX_ENABLED, 'Enabled')
+        self.InsertColumn(INDEX_URL, 'Feed URL')
+        self.InsertColumn(INDEX_TITLE, 'Feed Title')
+        self.InsertColumn(INDEX_INTERVAL, 'Interval')
+        self.InsertColumn(INDEX_CLICKS, 'Clicks')
         self.Bind(wx.EVT_LEFT_DOWN, self.on_left_down)
         self.Bind(wx.EVT_LIST_COL_CLICK, self.on_col_click)
         self.update()
+        self.SetColumnWidth(INDEX_ENABLED, -1)
+        self.SetColumnWidth(INDEX_URL, 175)
+        self.SetColumnWidth(INDEX_TITLE, 175)
+        self.SetColumnWidth(INDEX_INTERVAL, 75)
+        self.SetColumnWidth(INDEX_CLICKS, -2)
     def update(self):
         self.SetItemCount(len(self.model.feeds))
         self.Refresh()
@@ -506,12 +517,14 @@ class FeedsList(wx.ListCtrl):
         return 1 if feed.enabled else 0
     def OnGetItemText(self, index, column):
         feed = self.model.feeds[index]
-        if column == 1:
-            return util.split_time_str(feed.interval)
-        if column == 2:
-            return feed.title
-        if column == 3:
+        if column == INDEX_URL:
             return feed.url
+        if column == INDEX_TITLE:
+            return feed.title
+        if column == INDEX_INTERVAL:
+            return util.split_time_str(feed.interval)
+        if column == INDEX_CLICKS:
+            return str(feed.clicks)
         return ''
         
 class FeedsPanel(wx.Panel):
@@ -597,6 +610,11 @@ class FeedsPanel(wx.Panel):
             self.model.feeds.append(feed)
             self.update()
     def on_delete(self, event):
+        dialog = wx.MessageDialog(self.dialog, 'Are you sure you want to delete the selected feed(s)?', 'Confirm Delete', wx.YES_NO|wx.NO_DEFAULT|wx.ICON_QUESTION)
+        result = dialog.ShowModal()
+        dialog.Destroy()
+        if result != wx.ID_YES:
+            return
         feeds = []
         index = -1
         while True:

@@ -167,6 +167,12 @@ class PopupManager(wx.EvtHandler):
             self.timer = None
     def on_link(self, event):
         link = event.link
+        # track the click
+        item = self.items[self.index]
+        feed = item.feed
+        if link == item.link or link == feed.link:
+            feed.clicks += 1
+        # handle the click
         if link == BLANK:
             event.Skip()
         elif link == COMMAND_CLOSE:

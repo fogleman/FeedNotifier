@@ -52,11 +52,12 @@ class Feed(object):
         self.modified = None
         self.title = ''
         self.link = ''
+        self.clicks = 0
         self.id_list = []
         self.id_set = set()
     def make_copy(self):
         feed = Feed(self.url)
-        for key in ['uuid', 'enabled', 'interval', 'title', 'link']:
+        for key in ['uuid', 'enabled', 'interval', 'title', 'link', 'clicks']:
             value = getattr(self, key)
             setattr(feed, key, value)
         return feed
@@ -172,6 +173,10 @@ class FeedManager(object):
                 self.feeds, self.items = pickle.load(input)
         except Exception:
             self.feeds, self.items = [], []
+        # backward compatibility
+        for feed in self.feeds:
+            if not hasattr(feed, 'clicks'):
+                feed.clicks = 0
     def save(self, path='feeds.dat'):
         with open(path, 'wb') as output:
             data = (self.feeds, self.items)
