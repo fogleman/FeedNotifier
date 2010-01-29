@@ -911,6 +911,36 @@ class AboutPanel(wx.Panel):
         line = wx.StaticLine(self, -1)
         sizer.Add(line, 0, wx.EXPAND)
         sizer.Add(panel, 1, wx.EXPAND|wx.ALL, 8)
+        credits = '''
+        %s %s :: Copyright (c) 2009-2010, Michael Fogleman
+        
+        16x16px icons in this application are from the Silk Icon set provided by Mark James under a Creative Commons Attribution 2.5 License. http://www.famfamfam.com/lab/icons/silk/
+        
+        Third-party components of this software include the following:
+        
+        * Python 2.6 - http://www.python.org/
+        * wxPython 2.8.10 - http://www.wxpython.org/
+        * Universal Feed Parser - http://www.feedparser.org/
+        * Jinja 2 - http://jinja.pocoo.org/
+        * py2exe 0.6.9 - http://www.py2exe.org/
+        * Inno Setup - http://www.jrsoftware.org/isinfo.php
+        
+        Universal Feed Parser, a component of this software, requires that the following text be presented in this application:
+        
+        Copyright (c) 2002-2005, Mark Pilgrim
+        All rights reserved.
+        
+        Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+        
+        * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+        
+        THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+        ''' % (settings.APP_NAME, settings.APP_VERSION)
+        credits = '\n'.join(line.strip() for line in credits.strip().split('\n'))
+        text = wx.TextCtrl(self, -1, credits, style=wx.TE_MULTILINE|wx.TE_READONLY)
+        text.SetBackgroundColour(self.GetBackgroundColour())
+        sizer.Add(text, 0, wx.EXPAND|wx.ALL&~wx.TOP, 8)
         self.SetSizerAndFit(sizer)
     def create_panel(self, parent):
         panel = wx.Panel(parent, -1, style=wx.BORDER_SUNKEN)
