@@ -237,7 +237,8 @@ class EditFeedDialog(wx.Dialog):
             sizer.Add(label, (index, 0), flag=wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT)
         controls = []
         for index in indexes[:-1]:
-            control = wx.TextCtrl(parent, -1, '', size=(300, -1))
+            style = wx.TE_READONLY if index == 0 else 0
+            control = wx.TextCtrl(parent, -1, '', size=(300, -1), style=style)
             control.Bind(wx.EVT_TEXT, self.on_text)
             sizer.Add(control, (index, 1), (1, 2))
             controls.append(control)
@@ -246,7 +247,7 @@ class EditFeedDialog(wx.Dialog):
         url.ChangeValue(self.feed.url)
         title.ChangeValue(self.feed.title)
         link.ChangeValue(self.feed.link)
-        url.Disable()
+        url.SetBackgroundColour(parent.GetBackgroundColour())
         _interval, _units = util.split_time(self.feed.interval)
         interval = wx.SpinCtrl(parent, -1, str(_interval), min=1, max=60, size=(64, -1))
         units = wx.Choice(parent, -1)
