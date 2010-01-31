@@ -10,7 +10,8 @@ INDEX_ENABLED = 0
 INDEX_URL = 1
 INDEX_TITLE = 2
 INDEX_INTERVAL = 3
-INDEX_CLICKS = 4
+INDEX_ITEM_COUNT = 4
+INDEX_CLICKS = 5
 
 class TaskBarIcon(wx.TaskBarIcon):
     def __init__(self, controller):
@@ -380,6 +381,8 @@ class Model(object):
             return cmp(a.enabled, b.enabled)
         def cmp_clicks(a, b):
             return cmp(b.clicks, a.clicks)
+        def cmp_item_count(a, b):
+            return cmp(b.item_count, a.item_count)
         def cmp_interval(a, b):
             return cmp(a.interval, b.interval)
         def cmp_title(a, b):
@@ -392,6 +395,7 @@ class Model(object):
             INDEX_TITLE: cmp_title,
             INDEX_INTERVAL: cmp_interval,
             INDEX_CLICKS: cmp_clicks,
+            INDEX_ITEM_COUNT: cmp_item_count,
         }
         self.feeds.sort(cmp=funcs[column])
         if column == self._sort_column:
@@ -487,14 +491,16 @@ class FeedsList(wx.ListCtrl):
         self.InsertColumn(INDEX_URL, 'Feed URL')
         self.InsertColumn(INDEX_TITLE, 'Feed Title')
         self.InsertColumn(INDEX_INTERVAL, 'Interval')
+        self.InsertColumn(INDEX_ITEM_COUNT, 'Items')
         self.InsertColumn(INDEX_CLICKS, 'Clicks')
         self.Bind(wx.EVT_LEFT_DOWN, self.on_left_down)
         self.Bind(wx.EVT_LIST_COL_CLICK, self.on_col_click)
         self.update()
         self.SetColumnWidth(INDEX_ENABLED, -1)
-        self.SetColumnWidth(INDEX_URL, 175)
-        self.SetColumnWidth(INDEX_TITLE, 175)
+        self.SetColumnWidth(INDEX_URL, 165)
+        self.SetColumnWidth(INDEX_TITLE, 165)
         self.SetColumnWidth(INDEX_INTERVAL, 75)
+        self.SetColumnWidth(INDEX_ITEM_COUNT, -2)
         self.SetColumnWidth(INDEX_CLICKS, -2)
     def update(self):
         self.SetItemCount(len(self.model.feeds))
@@ -526,6 +532,8 @@ class FeedsList(wx.ListCtrl):
             return util.split_time_str(feed.interval)
         if column == INDEX_CLICKS:
             return str(feed.clicks) if feed.clicks else ''
+        if column == INDEX_ITEM_COUNT:
+            return str(feed.item_count) if feed.item_count else ''
         return ''
         
 class FeedsPanel(wx.Panel):

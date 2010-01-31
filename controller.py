@@ -43,7 +43,7 @@ class Controller(object):
         self.enabled = True
         self.poll()
     def disable(self):
-        self.frame.icon.set_icon('icons/feed_delete.png')
+        self.frame.icon.set_icon('icons/feed_disabled.png')
         self.enabled = False
     def save(self):
         self.manager.save()
