@@ -23,6 +23,10 @@ def select_choice(choice, data):
             return
     choice.Select(wx.NOT_FOUND)
     
+def get(obj, key, default):
+    value = obj.get(key, None)
+    return value or default
+    
 def abspath(path):
     path = os.path.abspath(path)
     path = 'file:///%s' % path.replace('\\', '/')
@@ -54,7 +58,7 @@ def guess_polling_interval(entries):
         return settings.DEFAULT_POLLING_INTERVAL
     timestamps = []
     for entry in entries:
-        timestamp = calendar.timegm(entry.get('date_parsed', time.gmtime()))
+        timestamp = calendar.timegm(get(entry, 'date_parsed', time.gmtime()))
         timestamps.append(timestamp)
     timestamps.sort()
     durations = [b - a for a, b in zip(timestamps, timestamps[1:])]

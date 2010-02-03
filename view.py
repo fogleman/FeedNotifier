@@ -82,10 +82,10 @@ class AddFeedDialog(wx.Dialog):
             if result != wx.ID_OK:
                 return None
             url = data.original_url
-            entries = data.get('entries', [])
+            entries = util.get(data, 'entries', [])
             feed = feeds.Feed(url)
-            feed.title = data.feed.title
-            feed.link = data.feed.link
+            feed.title = util.get(data.feed, 'title', '')
+            feed.link = util.get(data.feed, 'link', '')
             feed.interval = util.guess_polling_interval(entries)
             window = EditFeedDialog(parent, feed, True)
             window.Center()

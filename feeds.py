@@ -22,8 +22,9 @@ def cmp_received(a, b):
 def create_id(entry):
     keys = ['id', 'link', 'title']
     for key in keys:
-        if key in entry:
-            return str(entry[key])
+        value = util.get(entry, key, None)
+        if value:
+            return str(value)
     return uuid.uuid4().hex
     
 class Item(object):
@@ -116,13 +117,13 @@ class Feed(object):
         result = []
         self.last_poll = int(time.time())
         d = feedparser.parse(self.url, etag=self.etag, modified=self.modified, agent=settings.USER_AGENT, handlers=util.get_proxy())
-        self.etag = d.get('etag', None)
-        self.modified = d.get('modified', None)
-        feed = d.get('feed', None)
+        self.etag = util.get(d, 'etag', None)
+        self.modified = util.get(d, 'modified', None)
+        feed = util.get(d, 'feed', None)
         if feed:
-            self.title = self.title or feed.get('title', '')
-            self.link = self.link or feed.get('link', self.url)
-        entries = d.get('entries', [])
+            self.title = self.title or util.get(feed, 'title', '')
+            self.link = self.link or util.get(feed, 'link', self.url)
+        entries = util.get(d, 'entries', [])
         for entry in entries:
             id = create_id(entry)
             if id in self.id_set:
@@ -131,11 +132,11 @@ class Feed(object):
             self.id_list.append(id)
             self.id_set.add(id)
             item = Item(self, id)
-            item.timestamp = calendar.timegm(entry.get('date_parsed', time.gmtime()))
-            item.title = util.format(entry.get('title', ''), settings.POPUP_TITLE_LENGTH)
-            item.description = util.format(entry.get('description', ''), settings.POPUP_BODY_LENGTH)
-            item.link = entry.get('link', '')
-            item.author = util.format(entry.get('author', '')) # TODO: max length
+            item.timestamp = calendar.timegm(util.get(entry, 'date_parsed', time.gmtime()))
+            item.title = util.format(util.get(entry, 'title', ''), settings.POPUP_TITLE_LENGTH)
+            item.description = util.format(util.get(entry, 'description', ''), settings.POPUP_BODY_LENGTH)
+            item.link = util.get(entry, 'link', '')
+            item.author = util.format(util.get(entry, 'author', '')) # TODO: max length
             result.append(item)
         self.clean_cache(settings.FEED_CACHE_SIZE)
         return result
