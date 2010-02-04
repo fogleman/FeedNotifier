@@ -108,7 +108,7 @@ Some new features in v2.0 include:
 		</Application_URLs>
 		<Download_URLs>
 			<Primary_Download_URL>http://www.feed-notifier.com/files/feed-notifier-2.0.exe</Primary_Download_URL>
-			<Secondary_Download_URL>http://www.michaelfogleman.com/files/feed-notifier-2.0.exe</Secondary_Download_URL>
+			<Secondary_Download_URL>http://www.michaelfogleman.com/static/files/feed-notifier-2.0.exe</Secondary_Download_URL>
 			<Additional_Download_URL_1 />
 			<Additional_Download_URL_2 />
 		</Download_URLs>
