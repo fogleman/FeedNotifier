@@ -1,0 +1,120 @@
+<?xml version="1.0" ?>
+<XML_DIZ_INFO>
+	<MASTER_PAD_VERSION_INFO>
+		<MASTER_PAD_VERSION>3.10</MASTER_PAD_VERSION>
+		<MASTER_PAD_EDITOR>PADGen 3.1.0.41 http://www.padgen.org</MASTER_PAD_EDITOR>
+		<MASTER_PAD_INFO>Portable Application Description, or PAD for short, is a data set that is used by shareware authors to disseminate information to anyone interested in their software products. To find out more go to http://www.asp-shareware.org/pad</MASTER_PAD_INFO>
+	</MASTER_PAD_VERSION_INFO>
+	<Company_Info>
+		<Company_Name>Michael Fogleman</Company_Name>
+		<Address_1>221 Orchard Park Drive</Address_1>
+		<Address_2 />
+		<City_Town>Cary</City_Town>
+		<State_Province>NC</State_Province>
+		<Zip_Postal_Code>27513</Zip_Postal_Code>
+		<Country>US</Country>
+		<Company_WebSite_URL>http://www.michaelfogleman.com/</Company_WebSite_URL>
+		<Contact_Info>
+			<Author_First_Name>Michael</Author_First_Name>
+			<Author_Last_Name>Fogleman</Author_Last_Name>
+			<Author_Email>michael.fogleman@gmail.com</Author_Email>
+			<Contact_First_Name>Michael</Contact_First_Name>
+			<Contact_Last_Name>Fogleman</Contact_Last_Name>
+			<Contact_Email>michael.fogleman@gmail.com</Contact_Email>
+		</Contact_Info>
+		<Support_Info>
+			<Sales_Email>michael.fogleman@gmail.com</Sales_Email>
+			<Support_Email>michael.fogleman@gmail.com</Support_Email>
+			<General_Email>michael.fogleman@gmail.com</General_Email>
+			<Sales_Phone />
+			<Support_Phone />
+			<General_Phone />
+			<Fax_Phone />
+		</Support_Info>
+	</Company_Info>
+	<Program_Info>
+		<Program_Name>Feed Notifier</Program_Name>
+		<Program_Version>2.0</Program_Version>
+		<Program_Release_Month>02</Program_Release_Month>
+		<Program_Release_Day>03</Program_Release_Day>
+		<Program_Release_Year>2010</Program_Release_Year>
+		<Program_Cost_Dollars />
+		<Program_Cost_Other_Code />
+		<Program_Cost_Other />
+		<Program_Type>Freeware</Program_Type>
+		<Program_Release_Status>Major Update</Program_Release_Status>
+		<Program_Install_Support>Install and Uninstall</Program_Install_Support>
+		<Program_OS_Support>Win2000,Win7 x32,Win7 x64,WinServer,WinVista,WinVista x64,WinXP</Program_OS_Support>
+		<Program_Language>English</Program_Language>
+		<Program_Change_Info />
+		<Program_Specific_Category>Internet</Program_Specific_Category>
+		<Program_Category_Class>Network &amp; Internet::Other</Program_Category_Class>
+		<Program_System_Requirements />
+		<File_Info>
+			<File_Size_Bytes>7331275</File_Size_Bytes>
+			<File_Size_K>7159</File_Size_K>
+			<File_Size_MB>6.99</File_Size_MB>
+		</File_Info>
+		<Expire_Info>
+			<Has_Expire_Info>N</Has_Expire_Info>
+			<Expire_Count />
+			<Expire_Based_On>Days</Expire_Based_On>
+			<Expire_Other_Info />
+			<Expire_Month />
+			<Expire_Day />
+			<Expire_Year />
+		</Expire_Info>
+	</Program_Info>
+	<Program_Descriptions>
+		<English>
+			<Keywords>rss,atom,feed,aggregator,reader,notifier,notification,system,tray,windows,popup</Keywords>
+			<Char_Desc_45>RSS/Atom System Tray Pop-up Notifications</Char_Desc_45>
+			<Char_Desc_80>Feed Notifier displays RSS/Atom pop-up notifications on your desktop.</Char_Desc_80>
+			<Char_Desc_250>Feed Notifier is a Windows application that resides in the system tray and displays pop-up notifications on your desktop when new items are discovered in subscribed RSS/Atom feeds.</Char_Desc_250>
+			<Char_Desc_450>Feed Notifier is a Windows application that resides in the system tray and displays pop-up notifications on your desktop when new items are discovered in subscribed RSS/Atom feeds. Feed Notifier is what you get if you want real-time RSS/Atom notifications on your desktop without all the other stuff (clutter) that comes with most RSS readers.</Char_Desc_450>
+			<Char_Desc_2000>Feed Notifier is a Windows application that resides in the system tray and displays pop-up notifications on your desktop when new items are discovered in subscribed RSS/Atom feeds.
+
+Feed Notifier is what you get if you want real-time RSS/Atom notifications on your desktop without all the other stuff (clutter) that comes with most RSS readers.
+
+Some new features in v2.0 include:
+
+    *  Improved look and feel with support for themes.
+    * "Update Feeds" option to check all feeds on demand.
+    * Configurable pop-up size.
+    * Enable/Disable individual feeds without deleting them entirely.
+    * "Run at Startup" option in the installer.
+    * Item age displayed in pop-up, e.g. "5 minutes ago"
+    * Item author displayed in pop-up.
+    * Navigation controls displayed in pop-up, replacing the awkward pop-up stacking in v1.0.
+    * "Auto-play" option can be turned off to prevent popups from disappearing automatically.
+    * Pop-ups can be displayed in the center of the screen.
+    * System tray icon changes when the app is checking feeds.
+    * Automatically computes a good polling interval when adding a new feed.
+    * Shows the favicon for the feed when available.
+    * Number of items shown in pop-up, e.g. "4 of 12"
+    * Ability to edit feeds and configure feed titles and links.
+    * Proxy server support.
+    * Many more user preferences.
+</Char_Desc_2000>
+		</English>
+	</Program_Descriptions>
+	<Web_Info>
+		<Application_URLs>
+			<Application_Info_URL>http://www.feed-notifier.com/</Application_Info_URL>
+			<Application_Order_URL />
+			<Application_Screenshot_URL>http://www.feed-notifier.com/images/popup.png</Application_Screenshot_URL>
+			<Application_Icon_URL>http://www.feed-notifier.com/images/icon.png</Application_Icon_URL>
+			<Application_XML_File_URL>http://www.feed-notifier.com/pad.xml</Application_XML_File_URL>
+		</Application_URLs>
+		<Download_URLs>
+			<Primary_Download_URL>http://www.feed-notifier.com/files/feed-notifier-2.0.exe</Primary_Download_URL>
+			<Secondary_Download_URL>http://www.michaelfogleman.com/files/feed-notifier-2.0.exe</Secondary_Download_URL>
+			<Additional_Download_URL_1 />
+			<Additional_Download_URL_2 />
+		</Download_URLs>
+	</Web_Info>
+	<Permissions>
+		<Distribution_Permissions />
+		<EULA />
+	</Permissions>
+</XML_DIZ_INFO>
