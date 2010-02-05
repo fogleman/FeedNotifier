@@ -1,5 +1,6 @@
 import wx
 import sys
+import threading
 
 class CallbackContainer(object):
     def __init__(self):
@@ -8,10 +9,9 @@ class CallbackContainer(object):
         if self.callback:
             wx.CallAfter(self.callback, message)
             
-if sys.platform == 'win32':
+if False:#sys.platform == 'win32':
     import win32file
     import win32pipe
-    import threading
     import time
     
     def init():
@@ -70,8 +70,37 @@ if sys.platform == 'win32':
         except IOError:
             return False
 else:
+    import functools
+    import socket
+    import SocketServer
+    
     def init():
         container = CallbackContainer()
         message = '\n'.join(sys.argv[1:])
-        return container, message
+        host, port = 'localhost', 31763
+        try:
+            server(host, port, container)
+            return container, message
+        except socket.error:
+            client(host, port, message)
+        return None, message
+        
+    def server(host, port, callback_func):
+        class Handler(SocketServer.StreamRequestHandler):
+            def __init__(self, callback_func, *args, **kwargs):
+                self.callback_func = callback_func
+                SocketServer.StreamRequestHandler.__init__(self, *args, **kwargs)
+            def handle(self):
+                data = self.rfile.readline().strip()
+                self.callback_func(data)
+        server = SocketServer.TCPServer((host, port), functools.partial(Handler, callback_func))
+        thread = threading.Thread(target=server.serve_forever)
+        thread.setDaemon(True)
+        thread.start()
+        
+    def client(host, port, message):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((host, port))
+        sock.send(message)
+        sock.close()
         
