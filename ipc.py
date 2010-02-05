@@ -9,7 +9,7 @@ class CallbackContainer(object):
         if self.callback:
             wx.CallAfter(self.callback, message)
             
-if False:#sys.platform == 'win32':
+if sys.platform == 'win32':
     import win32file
     import win32pipe
     import time
