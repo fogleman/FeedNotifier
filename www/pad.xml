@@ -100,14 +100,14 @@ Some new features in v2.0 include:
 	</Program_Descriptions>
 	<Web_Info>
 		<Application_URLs>
-			<Application_Info_URL>http://www.feed-notifier.com/</Application_Info_URL>
+			<Application_Info_URL>http://www.feednotifier.com/</Application_Info_URL>
 			<Application_Order_URL />
-			<Application_Screenshot_URL>http://www.feed-notifier.com/images/popup.png</Application_Screenshot_URL>
-			<Application_Icon_URL>http://www.feed-notifier.com/images/icon.png</Application_Icon_URL>
-			<Application_XML_File_URL>http://www.feed-notifier.com/pad.xml</Application_XML_File_URL>
+			<Application_Screenshot_URL>http://www.feednotifier.com/images/popup.png</Application_Screenshot_URL>
+			<Application_Icon_URL>http://www.feednotifier.com/images/icon.png</Application_Icon_URL>
+			<Application_XML_File_URL>http://www.feednotifier.com/pad.xml</Application_XML_File_URL>
 		</Application_URLs>
 		<Download_URLs>
-			<Primary_Download_URL>http://www.feed-notifier.com/files/feed-notifier-2.0.exe</Primary_Download_URL>
+			<Primary_Download_URL>http://www.feednotifier.com/files/feed-notifier-2.0.exe</Primary_Download_URL>
 			<Secondary_Download_URL>http://www.michaelfogleman.com/static/files/feed-notifier-2.0.exe</Secondary_Download_URL>
 			<Additional_Download_URL_1 />
 			<Additional_Download_URL_2 />
