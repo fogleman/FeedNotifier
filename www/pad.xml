@@ -71,30 +71,27 @@
 			<Char_Desc_45>RSS/Atom System Tray Pop-up Notifications</Char_Desc_45>
 			<Char_Desc_80>Feed Notifier displays RSS/Atom pop-up notifications on your desktop.</Char_Desc_80>
 			<Char_Desc_250>Feed Notifier is a Windows application that resides in the system tray and displays pop-up notifications on your desktop when new items are discovered in subscribed RSS/Atom feeds.</Char_Desc_250>
-			<Char_Desc_450>Feed Notifier is a Windows application that resides in the system tray and displays pop-up notifications on your desktop when new items are discovered in subscribed RSS/Atom feeds. Feed Notifier is what you get if you want real-time RSS/Atom notifications on your desktop without all the other stuff (clutter) that comes with most RSS readers.</Char_Desc_450>
+			<Char_Desc_450>Feed Notifier is a Windows application that resides in the system tray and displays pop-up notifications on your desktop when new items are discovered in subscribed RSS/Atom feeds. Feed Notifier is for you if you want a news aggregator that focuses on real-time feed notifications and leaves out all the other stuff that comes with most news readers.</Char_Desc_450>
 			<Char_Desc_2000>Feed Notifier is a Windows application that resides in the system tray and displays pop-up notifications on your desktop when new items are discovered in subscribed RSS/Atom feeds.
 
-Feed Notifier is what you get if you want real-time RSS/Atom notifications on your desktop without all the other stuff (clutter) that comes with most RSS readers.
+Feed Notifier is for you if you want a news aggregator that focuses on real-time feed notifications and leaves out all the other stuff that comes with most news readers.
 
-Some new features in v2.0 include:
+Features include:
 
-    *  Improved look and feel with support for themes.
-    * "Update Feeds" option to check all feeds on demand.
-    * Configurable pop-up size.
-    * Enable/Disable individual feeds without deleting them entirely.
-    * "Run at Startup" option in the installer.
-    * Item age displayed in pop-up, e.g. "5 minutes ago"
-    * Item author displayed in pop-up.
-    * Navigation controls displayed in pop-up, replacing the awkward pop-up stacking in v1.0.
-    * "Auto-play" option can be turned off to prevent popups from disappearing automatically.
-    * Pop-ups can be displayed in the center of the screen.
-    * System tray icon changes when the app is checking feeds.
-    * Automatically computes a good polling interval when adding a new feed.
-    * Shows the favicon for the feed when available.
-    * Number of items shown in pop-up, e.g. "4 of 12"
-    * Ability to edit feeds and configure feed titles and links.
-    * Proxy server support.
-    * Many more user preferences.
+    * Support for all common RSS and Atom web feed protocols.
+    * Clean look and feel with user selectable themes.
+    * Support for launching from Firefox and other browsers via feed:// protocol.
+    * Support for enabling/disabling individual feeds.
+    * Configurable polling interval for each feed.
+    * Configurable pop-up duration.
+    * Configurable pop-up size and position.
+    * Configurable pop-up transparency.
+    * Pop-ups do not steal keyboard or mouse focus from other applications.
+    * Pop-ups show item age and author.
+    * Navigation controls in pop-ups to view next/previous items.
+    * Deactivates when user is idle to save bandwidth and processing time.
+    * Support for using a proxy server.
+    * Displays favicon for feeds when available.
 </Char_Desc_2000>
 		</English>
 	</Program_Descriptions>
