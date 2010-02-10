@@ -1,5 +1,4 @@
 import wx
-import wx.lib.iewin as ie
 import wx.webview as webview
 import webbrowser
 import templates
@@ -26,23 +25,6 @@ class Event(wx.PyEvent):
 EVT_LINK = wx.PyEventBinder(wx.NewEventType())
 EVT_POPUP_CLOSE = wx.PyEventBinder(wx.NewEventType())
 
-class BrowserControl(ie.IEHtmlWindow):
-    def __init__(self, parent):
-        super(BrowserControl, self).__init__(parent, -1)
-    def update_size(self):
-        try:
-            body = self.ctrl.Document.body
-            width = body.scrollWidth
-            height = body.scrollHeight
-            self.SetSize((width, height))
-        except AttributeError:
-            pass
-    def BeforeNavigate2(self, *args):
-        event = Event(self, EVT_LINK)
-        event.link = args[1][0]
-        self.ProcessEvent(event)
-        return not event.GetSkipped()
-        
 class BrowserControl(webview.WebView):
     def __init__(self, parent):
         super(BrowserControl, self).__init__(parent, -1)
@@ -80,7 +62,7 @@ class PopupFrame(wx.Frame):
         title = settings.APP_NAME
         style = wx.STAY_ON_TOP | wx.FRAME_NO_TASKBAR | wx.BORDER_NONE
         super(PopupFrame, self).__init__(None, -1, title, style=style)
-        self.SetTransparent(settings.POPUP_TRANSPARENCY)
+        #self.SetTransparent(settings.POPUP_TRANSPARENCY)
         self.control = BrowserControl(self)
     def load_src(self, html):
         self.control.load_src(html)
@@ -157,8 +139,8 @@ class PopupManager(wx.EvtHandler):
         current_item.read = True
         for item, frame in self.cache.items():
             if item == current_item:
-                pos = frame.GetPosition()
-                frame.SetPosition((-1000, -1000))
+                #pos = frame.GetPosition()
+                #frame.SetPosition((-1000, -1000))
                 if focus:
                     frame.Show()
                 else:
@@ -167,7 +149,7 @@ class PopupManager(wx.EvtHandler):
                     frame.Enable()
                 frame.Refresh()
                 frame.Update()
-                frame.SetPosition(pos)
+                #frame.SetPosition(pos)
         for item, frame in self.cache.items():
             if item != current_item:
                 frame.Hide()

@@ -7,7 +7,7 @@ import threading
 import socket
 from settings import settings
 
-WELCOME_FEED_URL = 'http://www.feed-notifier.com/welcome.xml'
+WELCOME_FEED_URL = 'http://www.feednotifier.com/welcome.xml'
 
 INVALID_ADDRESSES = [
     '127.0.0',
