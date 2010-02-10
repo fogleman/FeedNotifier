@@ -74,6 +74,11 @@ body {
     text-decoration: underline;
 }
 
+#donate {
+    margin: 20px;
+    #text-align: center;
+}
+
 #body {
     margin-left: 175px;
     max-width: 800px;
