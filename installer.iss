@@ -7,7 +7,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{6091F327-2B13-4193-A6F1-4B2271613A74}
 AppName=Feed Notifier
-AppVerName=Feed Notifier 2.0
+AppVerName=Feed Notifier 2.1
 AppPublisher=Michael Fogleman
 AppPublisherURL=http://www.feed-notifier.com/
 AppSupportURL=http://www.feed-notifier.com/
@@ -16,7 +16,7 @@ DefaultDirName={pf}\Feed Notifier
 DefaultGroupName=Feed Notifier
 AllowNoIcons=yes
 OutputDir=installer
-OutputBaseFilename=feed-notifier-2.0
+OutputBaseFilename=feed-notifier-2.1
 Compression=lzma
 SolidCompression=yes
 
@@ -53,4 +53,5 @@ Name: "{userstartup}\Feed Notifier"; Filename: "{app}\notifier.exe"; WorkingDir:
 
 [Run]
 Filename: "{app}\notifier.exe"; Description: "{cm:LaunchProgram,Feed Notifier}"; Flags: nowait postinstall
+
 
