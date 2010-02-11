@@ -91,3 +91,23 @@ setup(
     }],
     data_files = get_data_files(),
 )
+
+# Build Information
+def get_revision():
+    try:
+        import pysvn
+        client = pysvn.Client()
+        entry = client.info('.')
+        return entry.revision.number
+    except Exception:
+        return -1
+        
+def save_build_info():
+    revision = get_revision()
+    path = 'dist/revision.txt'
+    with open(path, 'w') as file:
+        file.write(str(revision))
+    print
+    print 'Saved build revision %d to %s' % (revision, path)
+    
+save_build_info()

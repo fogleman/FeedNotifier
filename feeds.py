@@ -24,7 +24,7 @@ def create_id(entry):
     for key in keys:
         value = util.get(entry, key, None)
         if value:
-            return str(value)
+            return value
     return uuid.uuid4().hex
     
 class Item(object):

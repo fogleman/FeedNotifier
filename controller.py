@@ -7,8 +7,6 @@ import threading
 import socket
 from settings import settings
 
-WELCOME_FEED_URL = 'http://www.feednotifier.com/welcome.xml'
-
 INVALID_ADDRESSES = [
     '127.0.0',
     '169.254',
@@ -20,17 +18,18 @@ class Controller(object):
         self.frame = view.HiddenFrame(self)
         self.manager = feeds.FeedManager()
         self.manager.load()
-        self.add_welcome_feed()
+        self.add_default_feeds()
         self.popup = None
         self.polling = False
         self.enabled = True
         self.on_poll()
-    def add_welcome_feed(self):
+    def add_default_feeds(self):
         if self.manager.feeds:
             return
-        feed = feeds.Feed(WELCOME_FEED_URL)
-        feed.interval = 60 * 60 * 24
-        self.manager.add_feed(feed)
+        for url in settings.DEFAULT_FEED_URLS:
+            feed = feeds.Feed(url)
+            feed.interval = 60 * 60 * 24
+            self.manager.add_feed(feed)
     def parse_args(self, message):
         urls = message.split('\n')
         for url in urls:
