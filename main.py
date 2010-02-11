@@ -16,7 +16,7 @@ def main():
     container, message = ipc.init()
     if not container:
         return
-    app = wx.PySimpleApp()
+    app = wx.PySimpleApp(redirect=True, filename='log.txt')
     ctrl = controller.Controller()
     container.callback = ctrl.parse_args
     container(message)

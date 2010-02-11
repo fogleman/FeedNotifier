@@ -5,6 +5,10 @@ body {
     cursor: default;
 }
 
+div {
+    overflow: hidden;
+}
+
 a {
     color: #000;
     text-decoration: none;
