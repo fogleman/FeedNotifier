@@ -52,6 +52,5 @@ Name: "{userappdata}\Microsoft\Internet Explorer\Quick Launch\Feed Notifier"; Fi
 Name: "{userstartup}\Feed Notifier"; Filename: "{app}\notifier.exe"; WorkingDir: "{app}"; Tasks: startupicon
 
 [Run]
-Filename: "{app}\notifier.exe"; Description: "{cm:LaunchProgram,Feed Notifier}"; Flags: nowait postinstall skipifsilent
-
+Filename: "{app}\notifier.exe"; Description: "{cm:LaunchProgram,Feed Notifier}"; Flags: nowait postinstall
 
