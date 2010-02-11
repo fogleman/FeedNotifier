@@ -34,10 +34,11 @@ class BrowserControl(ie.IEHtmlWindow):
         except AttributeError:
             pass
     def BeforeNavigate2(self, *args):
+        link = args[1][0]
         event = Event(self, EVT_LINK)
-        event.link = args[1][0]
-        self.ProcessEvent(event)
-        return not event.GetSkipped()
+        event.link = link
+        wx.PostEvent(self, event)
+        return link != BLANK
         
 class PopupFrame(wx.Frame):
     def __init__(self):

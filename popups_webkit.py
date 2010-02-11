@@ -145,7 +145,6 @@ class PopupManager(wx.EvtHandler):
                     frame.Disable()
                     frame.Show()
                     frame.Enable()
-                frame.Refresh()
                 frame.Update()
                 frame.SetTransparent(settings.POPUP_TRANSPARENCY)
         for item, frame in self.cache.items():
