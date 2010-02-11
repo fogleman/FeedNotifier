@@ -62,7 +62,7 @@ class PopupFrame(wx.Frame):
         title = settings.APP_NAME
         style = wx.STAY_ON_TOP | wx.FRAME_NO_TASKBAR | wx.BORDER_NONE
         super(PopupFrame, self).__init__(None, -1, title, style=style)
-        #self.SetTransparent(settings.POPUP_TRANSPARENCY)
+        self.SetTransparent(0)
         self.control = BrowserControl(self)
     def load_src(self, html):
         self.control.load_src(html)
@@ -139,8 +139,6 @@ class PopupManager(wx.EvtHandler):
         current_item.read = True
         for item, frame in self.cache.items():
             if item == current_item:
-                #pos = frame.GetPosition()
-                #frame.SetPosition((-1000, -1000))
                 if focus:
                     frame.Show()
                 else:
@@ -149,7 +147,7 @@ class PopupManager(wx.EvtHandler):
                     frame.Enable()
                 frame.Refresh()
                 frame.Update()
-                #frame.SetPosition(pos)
+                frame.SetTransparent(settings.POPUP_TRANSPARENCY)
         for item, frame in self.cache.items():
             if item != current_item:
                 frame.Hide()
