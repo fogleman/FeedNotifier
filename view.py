@@ -791,18 +791,18 @@ class OptionsPanel(wx.Panel):
     def create_panel(self, parent):
         panel = wx.Panel(parent, -1)
         sizer = wx.BoxSizer(wx.VERTICAL)
-        polling = self.create_polling(panel)
+        general = self.create_general(panel)
         caching = self.create_caching(panel)
         proxy = self.create_proxy(panel)
-        sizer.Add(polling, 0, wx.EXPAND)
+        sizer.Add(general, 0, wx.EXPAND)
         sizer.AddSpacer(8)
         sizer.Add(caching, 0, wx.EXPAND)
         sizer.AddSpacer(8)
         sizer.Add(proxy, 0, wx.EXPAND)
         panel.SetSizerAndFit(sizer)
         return panel
-    def create_polling(self, parent):
-        box = wx.StaticBox(parent, -1, 'Polling')
+    def create_general(self, parent):
+        box = wx.StaticBox(parent, -1, 'General')
         sizer = wx.StaticBoxSizer(box, wx.VERTICAL)
         grid = wx.GridBagSizer(8, 8)
         
@@ -814,13 +814,18 @@ class OptionsPanel(wx.Panel):
         timeout = wx.SpinCtrl(parent, -1, '1', min=1, max=9999, size=(64, -1))
         grid.Add(timeout, (0, 1))
         
+        auto_update = wx.CheckBox(parent, -1, 'Check for software updates automatically')
+        grid.Add(auto_update, (1, 0), (1, 3), flag=wx.ALIGN_CENTER_VERTICAL)
+        
         sizer.Add(grid, 1, wx.EXPAND|wx.ALL, 8)
         
         timeout.Bind(wx.EVT_SPINCTRL, self.on_change)
         idle.Bind(wx.EVT_CHECKBOX, self.on_change)
+        auto_update.Bind(wx.EVT_CHECKBOX, self.on_change)
         
         self.idle = idle
         self.timeout = timeout
+        self.auto_update = auto_update
         return sizer
     def create_caching(self, parent):
         box = wx.StaticBox(parent, -1, 'Caching')
@@ -882,6 +887,7 @@ class OptionsPanel(wx.Panel):
         model = self.model
         self.idle.SetValue(model.DISABLE_WHEN_IDLE)
         self.timeout.SetValue(model.USER_IDLE_TIMEOUT)
+        self.auto_update.SetValue(model.CHECK_FOR_UPDATES)
         one_day = 60 * 60 * 24
         self.item.SetValue(model.ITEM_CACHE_AGE / one_day)
         self.feed.SetValue(model.FEED_CACHE_SIZE)
@@ -892,6 +898,7 @@ class OptionsPanel(wx.Panel):
         model = self.model
         model.DISABLE_WHEN_IDLE = self.idle.GetValue()
         model.USER_IDLE_TIMEOUT = self.timeout.GetValue()
+        model.CHECK_FOR_UPDATES = self.auto_update.GetValue()
         one_day = 60 * 60 * 24
         model.ITEM_CACHE_AGE = self.item.GetValue() * one_day
         model.FEED_CACHE_SIZE = self.feed.GetValue()
@@ -920,7 +927,7 @@ class AboutPanel(wx.Panel):
         sizer.Add(line, 0, wx.EXPAND)
         sizer.Add(panel, 1, wx.EXPAND|wx.ALL, 8)
         credits = '''
-        %s %s :: Copyright (c) 2009-2010, Michael Fogleman
+        %s %s :: Build %d :: Copyright (c) 2009-2010, Michael Fogleman
         
         16x16px icons in this application are from the Silk Icon set provided by Mark James under a Creative Commons Attribution 2.5 License. http://www.famfamfam.com/lab/icons/silk/
         
@@ -963,7 +970,7 @@ class AboutPanel(wx.Panel):
         * The names of the contributors may not be used to endorse or promote products derived from this software without specific prior written permission.
         
         THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-        ''' % (settings.APP_NAME, settings.APP_VERSION)
+        ''' % (settings.APP_NAME, settings.APP_VERSION, settings.LOCAL_REVISION)
         credits = '\n'.join(line.strip() for line in credits.strip().split('\n'))
         text = wx.TextCtrl(self, -1, credits, style=wx.TE_MULTILINE|wx.TE_READONLY)
         text.SetBackgroundColour(self.GetBackgroundColour())

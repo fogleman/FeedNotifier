@@ -1,3 +1,11 @@
+# Helper Functions
+def load_revision():
+    try:
+        with open('revision.txt', 'r') as file:
+            return int(file.read().strip())
+    except Exception:
+        return -1
+        
 # Popup Settings
 POPUP_DURATION = 5
 POPUP_AUTO_PLAY = True
@@ -30,8 +38,11 @@ USE_PROXY = False
 PROXY_URL = ''
 
 # Updater Settings
+LOCAL_REVISION = load_revision()
 REVISION_URL = 'http://www.feednotifier.com/update/revision.txt'
 INSTALLER_URL = 'http://www.feednotifier.com/update/installer.exe'
 CHECK_FOR_UPDATES = True
 UPDATE_INTERVAL = 60 * 60 * 24 * 7
 UPDATE_TIMESTAMP = None
+
+del load_revision
