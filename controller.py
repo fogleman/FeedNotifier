@@ -121,9 +121,12 @@ class Controller(object):
         window.ShowModal()
         window.Destroy()
     def close(self):
-        if self.popup:
-            self.popup.on_close()
-        self.frame.Close()
+        try:
+            if self.popup:
+                self.popup.on_close()
+            self.frame.Close()
+        finally:
+            wx.GetApp().ExitMainLoop()
     def on_popup_close(self, event):
         self.popup = None
         self.manager.purge_items(settings.ITEM_CACHE_AGE)
