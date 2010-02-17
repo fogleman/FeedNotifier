@@ -13,6 +13,25 @@ COMMAND_LAST = 'http://last/'
 COMMAND_PLAY = 'http://play/'
 COMMAND_PAUSE = 'http://pause/'
 
+def position_window(window):
+    x, y, w, h = wx.ClientDisplayRect()
+    cw, ch = window.GetSize()
+    pad = 10
+    x1 = x + pad
+    y1 = y + pad
+    x2 = x + w - cw - pad
+    y2 = y + h - ch - pad
+    x3 = x + w / 2 - cw / 2
+    y3 = y + h / 2 - ch / 2
+    lookup = {
+        (-1, -1): (x1, y1),
+        (1, -1): (x2, y1),
+        (-1, 1): (x1, y2),
+        (1, 1): (x2, y2),
+        (0, 0): (x3, y3),
+    }
+    window.SetPosition(lookup[settings.POPUP_POSITION])
+    
 class Event(wx.PyEvent):
     def __init__(self, event_object, type):
         super(Event, self).__init__()
@@ -45,30 +64,12 @@ class PopupFrame(wx.Frame):
         title = settings.APP_NAME
         style = wx.STAY_ON_TOP | wx.FRAME_NO_TASKBAR | wx.BORDER_NONE
         super(PopupFrame, self).__init__(None, -1, title, style=style)
-        self.SetTransparent(settings.POPUP_TRANSPARENCY)
         self.control = BrowserControl(self)
     def load_src(self, html):
         control = self.control
         control.LoadString(html)
         control.update_size()
         self.Fit()
-        x, y, w, h = wx.ClientDisplayRect()
-        cw, ch = self.GetSize()
-        pad = 10
-        x1 = x + pad
-        y1 = y + pad
-        x2 = x + w - cw - pad
-        y2 = y + h - ch - pad
-        x3 = x + w / 2 - cw / 2
-        y3 = y + h / 2 - ch / 2
-        lookup = {
-            (-1, -1): (x1, y1),
-            (1, -1): (x2, y1),
-            (-1, 1): (x1, y2),
-            (1, 1): (x2, y2),
-            (0, 0): (x3, y3),
-        }
-        self.SetPosition(lookup[settings.POPUP_POSITION])
         
 class PopupManager(wx.EvtHandler):
     def __init__(self):
@@ -129,16 +130,27 @@ class PopupManager(wx.EvtHandler):
                     frame.Show()
                     frame.Enable()
                 frame.Update()
+                if settings.POPUP_TRANSPARENCY < 255:
+                    frame.SetTransparent(settings.POPUP_TRANSPARENCY)
         for item, frame in self.cache.items():
             if item != current_item:
                 frame.Hide()
     def create_frame(self, item):
-        html = self.render_item(item)
-        frame = PopupFrame()
-        frame.control.Bind(EVT_LINK, self.on_link)
-        frame.load_src(html)
+        if settings.POPUP_THEME == 'default':
+            import theme_default
+            context = self.create_context(item)
+            frame = theme_default.Frame(item, context)
+            frame.Bind(EVT_LINK, self.on_link)
+        else:
+            html = self.render_item(item)
+            frame = PopupFrame()
+            frame.control.Bind(EVT_LINK, self.on_link)
+            frame.load_src(html)
+        position_window(frame)
+        if settings.POPUP_TRANSPARENCY < 255:
+            frame.SetTransparent(0)
         return frame
-    def render_item(self, item):
+    def create_context(self, item):
         context = {}
         count = str(self.count)
         index = str(self.items.index(item) + 1)
@@ -155,6 +167,9 @@ class PopupManager(wx.EvtHandler):
         context['COMMAND_LAST'] = COMMAND_LAST
         context['COMMAND_PLAY'] = COMMAND_PLAY
         context['COMMAND_PAUSE'] = COMMAND_PAUSE
+        return context
+    def render_item(self, item):
+        context = self.create_context(item)
         html = templates.render(settings.POPUP_THEME, item, context)
         return html
     def set_timer(self):

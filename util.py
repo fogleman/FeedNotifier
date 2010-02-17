@@ -23,6 +23,13 @@ def select_choice(choice, data):
             return
     choice.Select(wx.NOT_FOUND)
     
+def get_top_window(window):
+    result = None
+    while window:
+        result = window
+        window = window.GetParent()
+    return result
+    
 def get(obj, key, default):
     value = obj.get(key, None)
     return value or default
