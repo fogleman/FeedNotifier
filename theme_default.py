@@ -1,6 +1,7 @@
 import wx
 import controls
 import popups
+import util
 from settings import settings
 
 BACKGROUND = (230, 230, 230)
@@ -58,7 +59,9 @@ class Frame(wx.Frame):
             path = feed.favicon_path
         else:
             path = 'icons/feed.png'
-        icon = controls.BitmapLink(panel, feed.link, wx.Bitmap(path))
+        bitmap = wx.Bitmap(path)
+        bitmap = util.scale_bitmap(bitmap, 16, 16, wx.Colour(*BACKGROUND))
+        icon = controls.BitmapLink(panel, feed.link, bitmap)
         icon.SetBackgroundColour(wx.Colour(*BACKGROUND))
         width, height = icon.GetSize()
         feed = self.create_feed(panel, width)

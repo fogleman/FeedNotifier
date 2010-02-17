@@ -7,6 +7,20 @@ import urllib2
 from htmlentitydefs import name2codepoint
 from settings import settings
 
+def scale_bitmap(bitmap, width, height, color):
+    bw, bh = bitmap.GetWidth(), bitmap.GetHeight()
+    if bw == width and bh == height:
+        return bitmap
+    buffer = wx.EmptyBitmap(bw, bh)
+    dc = wx.MemoryDC(buffer)
+    dc.SetBackground(wx.Brush(color))
+    dc.Clear()
+    dc.DrawBitmap(bitmap, 0, 0, True)
+    image = wx.ImageFromBitmap(buffer)
+    image = image.Scale(width, height, wx.IMAGE_QUALITY_HIGH)
+    result = wx.BitmapFromImage(image)
+    return result
+    
 def menu_item(menu, label, func, icon=None, kind=wx.ITEM_NORMAL):
     item = wx.MenuItem(menu, -1, label, kind=kind)
     if func:
