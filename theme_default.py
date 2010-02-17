@@ -60,7 +60,8 @@ class Frame(wx.Frame):
             path = 'icons/feed.png'
         icon = controls.BitmapLink(panel, feed.link, wx.Bitmap(path))
         icon.SetBackgroundColour(wx.Colour(*BACKGROUND))
-        feed = self.create_feed(panel)
+        width, height = icon.GetSize()
+        feed = self.create_feed(panel, width)
         button = controls.BitmapLink(panel, popups.COMMAND_CLOSE, wx.Bitmap('themes/default/cross.png'), wx.Bitmap('themes/default/cross_hover.png'))
         button.SetBackgroundColour(wx.Colour(*BACKGROUND))
         sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -70,8 +71,8 @@ class Frame(wx.Frame):
         panel.SetSizer(sizer)
         self.bind_links([icon, button])
         return panel
-    def create_feed(self, parent):
-        width = settings.POPUP_WIDTH - 80
+    def create_feed(self, parent, icon_width):
+        width = settings.POPUP_WIDTH - 64 - icon_width
         link = controls.Link(parent, width, self.item.feed.link, self.item.feed.title)
         link.SetBackgroundColour(wx.Colour(*BACKGROUND))
         font = link.GetFont()
