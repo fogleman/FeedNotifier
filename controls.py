@@ -155,7 +155,7 @@ class BitmapLink(wx.PyPanel):
         dc.SetBackground(wx.Brush(self.GetBackgroundColour()))
         dc.Clear()
         bitmap = self.hover_bitmap if self.hover else self.bitmap
-        dc.DrawBitmap(bitmap, 0, 0)
+        dc.DrawBitmap(bitmap, 0, 0, True)
     def on_enter(self, event):
         self.hover = True
         self.SetCursor(wx.StockCursor(wx.CURSOR_HAND))
