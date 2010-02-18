@@ -3,7 +3,7 @@ a img {
 }
 
 body {
-    margin: 15px 25px;
+    margin: 15px 15px;
     padding: 0;
     font-family: Tahoma, Arial, sans-serif;
 }
@@ -17,12 +17,12 @@ body {
 }
 
 #sidebar {
-    width: 160px;
+    width: 180px;
     float: left;
 }
 
 #logo img {
-    margin: 20px 15px 10px 15px;
+    margin: 20px 25px 10px 25px;
 }
 
 #title h3 {
@@ -76,11 +76,14 @@ body {
 
 #donate {
     margin: 20px;
-    #text-align: center;
+}
+
+#links {
+    text-align: center;
 }
 
 #body {
-    margin-left: 175px;
+    margin-left: 195px;
     max-width: 800px;
     border: 1px solid #ccc;
 }
