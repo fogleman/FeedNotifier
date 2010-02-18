@@ -1,6 +1,6 @@
 import wx
 import sys
-import threading
+import util
 
 class CallbackContainer(object):
     def __init__(self):
@@ -21,9 +21,7 @@ if sys.platform == 'win32':
         if client(name, message):
             return None, message
         else:
-            thread = threading.Thread(target=server, args=(name, container))
-            thread.setDaemon(True)
-            thread.start()
+            util.start_thread(server, name, container)
             return container, message
             
     def server(name, callback_func):
@@ -94,9 +92,7 @@ else:
                 data = self.rfile.readline().strip()
                 self.callback_func(data)
         server = SocketServer.TCPServer((host, port), functools.partial(Handler, callback_func))
-        thread = threading.Thread(target=server.serve_forever)
-        thread.setDaemon(True)
-        thread.start()
+        util.start_thread(server.serve_forever)
         
     def client(host, port, message):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

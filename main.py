@@ -2,7 +2,6 @@ import wx
 import os
 import ipc
 import controller
-import updater
 
 def set_path():
     file = controller.__file__
@@ -20,7 +19,6 @@ def main():
     ctrl = controller.Controller()
     container.callback = ctrl.parse_args
     container(message)
-    updater.run(ctrl)
     app.MainLoop()
     
 if __name__ == '__main__':

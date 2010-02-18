@@ -42,7 +42,7 @@ LOCAL_REVISION = load_revision()
 REVISION_URL = 'http://www.feednotifier.com/update/revision.txt'
 INSTALLER_URL = 'http://www.feednotifier.com/update/installer.exe'
 CHECK_FOR_UPDATES = True
-UPDATE_INTERVAL = 60 * 60 * 24 * 7
+UPDATE_INTERVAL = 60 * 60 * 24 * 1
 UPDATE_TIMESTAMP = 0
 
 del load_revision

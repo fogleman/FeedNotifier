@@ -2,8 +2,8 @@ import wx
 import os
 import time
 import urllib
-import threading
 import tempfile
+import util
 from settings import settings
 
 class CancelException(Exception):
@@ -27,9 +27,7 @@ class DownloadDialog(wx.Dialog):
         self.SetSizerAndFit(wrapper)
         self.start_download()
     def start_download(self):
-        thread = threading.Thread(target=self.download)
-        thread.setDaemon(True)
-        thread.start()
+        util.start_thread(self.download)
     def download(self):
         try:
             self.path = download_installer(self.listener)
@@ -74,28 +72,38 @@ def download_installer(listener):
 def should_check():
     last_check = settings.UPDATE_TIMESTAMP
     now = int(time.time())
-    settings.UPDATE_TIMESTAMP = now
     elapsed = now - last_check
     return elapsed >= settings.UPDATE_INTERVAL
     
-def should_update():
-    if not should_check():
-        return False
+def should_update(force):
+    if not force:
+        if not should_check():
+            return False
+    now = int(time.time())
+    settings.UPDATE_TIMESTAMP = now
     local = settings.LOCAL_REVISION
     remote = get_remote_revision()
     if local < 0 or remote < 0:
         return False
     return remote > local
     
-def do_check(controller):
-    if should_update():
+def do_check(controller, force=False):
+    if should_update(force):
         wx.CallAfter(do_ask, controller)
+    elif force:
+        wx.CallAfter(do_tell, controller)
         
 def do_ask(controller):
     dialog = wx.MessageDialog(controller.frame, 'Feed Notifier software updates are available.  Download and install now?', 'Update Feed Notifier?', wx.YES_NO|wx.YES_DEFAULT|wx.ICON_QUESTION)
     if dialog.ShowModal() == wx.ID_YES:
         do_download(controller)
-        
+    dialog.Destroy()
+    
+def do_tell(controller):
+    dialog = wx.MessageDialog(controller.frame, 'No software updates are available at this time.', 'No Updates', wx.OK|wx.ICON_INFORMATION)
+    dialog.ShowModal()
+    dialog.Destroy()
+    
 def do_download(controller):
     dialog = DownloadDialog(controller.frame)
     dialog.Center()
@@ -110,9 +118,7 @@ def do_install(controller, path):
     time.sleep(1)
     os.execvp(path, (path, '/sp-', '/silent', '/norestart'))
     
-def run(controller):
-    if settings.CHECK_FOR_UPDATES:
-        thread = threading.Thread(target=do_check, args=(controller,))
-        thread.setDaemon(True)
-        thread.start()
+def run(controller, force=False):
+    if force or settings.CHECK_FOR_UPDATES:
+        util.start_thread(do_check, controller, force)
         

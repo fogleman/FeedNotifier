@@ -1,7 +1,6 @@
 import wx
 import util
 import feeds
-import threading
 import feedparser
 from settings import settings
 
@@ -169,9 +168,7 @@ class AddFeedDialog(wx.Dialog):
         self.url.Disable()
         self.next.Disable()
         self.status.SetLabel('Checking feed, please wait...')
-        thread = threading.Thread(target=self.check_feed, args=(url,))
-        thread.setDaemon(True)
-        thread.start()
+        util.start_thread(self.check_feed, url)
     def on_valid(self, result):
         self.result = result
         self.EndModal(wx.ID_OK)
@@ -810,17 +807,21 @@ class OptionsPanel(wx.Panel):
         grid.Add(timeout, (0, 1))
         
         auto_update = wx.CheckBox(parent, -1, 'Check for software updates automatically')
-        grid.Add(auto_update, (1, 0), (1, 3), flag=wx.ALIGN_CENTER_VERTICAL)
+        grid.Add(auto_update, (1, 0), flag=wx.ALIGN_CENTER_VERTICAL)
+        check_now = wx.Button(parent, -1, 'Check Now')
+        grid.Add(check_now, (1, 1), flag=wx.ALIGN_CENTER_VERTICAL)
         
         sizer.Add(grid, 1, wx.EXPAND|wx.ALL, 8)
         
         timeout.Bind(wx.EVT_SPINCTRL, self.on_change)
         idle.Bind(wx.EVT_CHECKBOX, self.on_change)
         auto_update.Bind(wx.EVT_CHECKBOX, self.on_change)
+        check_now.Bind(wx.EVT_BUTTON, self.on_check_now)
         
         self.idle = idle
         self.timeout = timeout
         self.auto_update = auto_update
+        self.check_now = check_now
         return sizer
     def create_caching(self, parent):
         box = wx.StaticBox(parent, -1, 'Caching')
@@ -912,6 +913,9 @@ class OptionsPanel(wx.Panel):
     def on_clear_feed(self, event):
         self.model.controller.manager.clear_feed_cache()
         self.clear_feed.Disable()
+    def on_check_now(self, event):
+        self.check_now.Disable()
+        self.model.controller.check_for_updates()
         
 class AboutPanel(wx.Panel):
     def __init__(self, parent):

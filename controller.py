@@ -3,8 +3,9 @@ import idle
 import feeds
 import popups
 import view
-import threading
 import socket
+import updater
+import util
 from settings import settings
 
 INVALID_ADDRESSES = [
@@ -23,6 +24,7 @@ class Controller(object):
         self.polling = False
         self.enabled = True
         self.on_poll()
+        self.check_for_updates(False)
     def add_default_feeds(self):
         if self.manager.feeds:
             return
@@ -67,9 +69,7 @@ class Controller(object):
                 return
         self.polling = True
         self.frame.icon.set_icon('icons/feed_go.png')
-        thread = threading.Thread(target=self._poll_thread)
-        thread.setDaemon(True)
-        thread.start()
+        util.start_thread(self._poll_thread)
     def _poll_thread(self):
         try:
             found_new = False
@@ -120,6 +120,8 @@ class Controller(object):
         window.Center()
         window.ShowModal()
         window.Destroy()
+    def check_for_updates(self, force=True):
+        updater.run(self, force)
     def close(self):
         try:
             if self.popup:
