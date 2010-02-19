@@ -13,6 +13,19 @@
 </head>
 
 <body>
+    <!-- begin analytics -->
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+    var pageTracker = _gat._getTracker("UA-1508445-3");
+    pageTracker._setDomainName("none");
+    pageTracker._setAllowLinker(true);
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+    <!-- end analytics -->
     <div id='container'>
         <div id='sidebar'>
             <div id='logo'>
@@ -41,8 +54,8 @@
                         <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
                         </form>
                     </p>
-                    <p><a target='_blank' href="http://download.cnet.com/Feed-Notifier/3000-2164_4-75123296.html?part=dl-10082632&subj=dl&tag=button"><img src="http://i.i.com.com/cnwk.1d/i/dl/button/dl-button_a.gif" alt="Get it from CNET Download.com!" height="60" width="150" align="center" border="0"></a></p>
-                    <p><a target='_blank' href="http://www.softpedia.com/get/Internet/News-Newsgroups-Blog-Tools/Feed-Notifier.shtml"><img src="http://www.softpedia.com/base_img/softpedia_free_award_f.gif" /></a></p>
+                    <p><a target='_blank' onClick='javascript:pageTracker._trackPageview("/external/cnet");' href="http://download.cnet.com/Feed-Notifier/3000-2164_4-75123296.html?part=dl-10082632&subj=dl&tag=button"><img src="http://i.i.com.com/cnwk.1d/i/dl/button/dl-button_a.gif" alt="Get it from CNET Download.com!" height="60" width="150" align="center" border="0"></a></p>
+                    <p><a target='_blank' onClick='javascript:pageTracker._trackPageview("/external/softpedia");' href="http://www.softpedia.com/get/Internet/News-Newsgroups-Blog-Tools/Feed-Notifier.shtml"><img src="http://www.softpedia.com/base_img/softpedia_free_award_f.gif" /></a></p>
                 </div>
             </div>
         </div>
@@ -79,18 +92,6 @@
             <div class='clear'></div>
         </div>
     </div>
-    <!-- ugly analytics -->
-    <script type="text/javascript">
-    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-    </script>
-    <script type="text/javascript">
-    try {
-    var pageTracker = _gat._getTracker("UA-1508445-3");
-    pageTracker._setDomainName("none");
-    pageTracker._setAllowLinker(true);
-    pageTracker._trackPageview();
-    } catch(err) {}</script>
 </body>
 
 </html>
