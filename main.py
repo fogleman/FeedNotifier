@@ -1,10 +1,7 @@
-import wx
-import os
-import ipc
-import controller
-
 def set_path():
-    file = controller.__file__
+    import os
+    import dummy
+    file = dummy.__file__
     file = os.path.abspath(file)
     while file and not os.path.isdir(file):
         file, ext = os.path.split(file)
@@ -12,6 +9,9 @@ def set_path():
     
 def main():
     set_path()
+    import wx
+    import ipc
+    import controller
     container, message = ipc.init()
     if not container:
         return
