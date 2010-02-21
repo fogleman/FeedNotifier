@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <title>Feed Notifier - Welcome Feed</title>
-    <link href="http://www.feed-notifier.com/" />
+    <title>Feed Notifier</title>
+    <link href="http://www.feednotifier.com/" />
     <entry>
         <title>Feed Notifier Welcomes You!</title>
         <link href="http://www.feed-notifier.com/" />
