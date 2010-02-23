@@ -182,16 +182,93 @@ class AddFeedDialog(wx.Dialog):
         dialog.Destroy()
         self.url.SelectAll()
         self.url.SetFocus()
-    def check_feed(self, url):
-        d = feedparser.parse(url, agent=settings.USER_AGENT, handlers=util.get_proxy())
+    def on_password(self):
+        url = self.url.GetValue()
+        dialog = PasswordDialog(self)
+        dialog.Center()
+        result = dialog.ShowModal()
+        username = dialog.username.GetValue()
+        password = dialog.password.GetValue()
+        dialog.Destroy()
+        if result == wx.ID_OK:
+            util.start_thread(self.check_feed, url, username, password)
+        else:
+            self.url.Enable()
+            self.next.Enable()
+            self.status.SetLabel('')
+            self.url.SelectAll()
+            self.url.SetFocus()
+    def check_feed(self, url, username=None, password=None):
+        if username and password:
+            auth_url = util.insert_credentials(url, username, password)
+        else:
+            auth_url = url
+        d = feedparser.parse(auth_url, agent=settings.USER_AGENT, handlers=util.get_proxy())
+        status = d.get('status', 0)
         if not self: # cancelled
             return
-        if d['entries']:
+        if status == 401: # password protected
+            wx.CallAfter(self.on_password)
+        elif d['entries'] or (status == 200 and not d.bozo):
             d['original_url'] = url
             wx.CallAfter(self.on_valid, d)
         else:
             wx.CallAfter(self.on_invalid)
             
+class PasswordDialog(wx.Dialog):
+    def __init__(self, parent):
+        super(PasswordDialog, self).__init__(parent, -1, 'Password Required')
+        panel = self.create_panel(self)
+        self.Fit()
+        self.validate()
+    def create_panel(self, parent):
+        panel = wx.Panel(parent, -1)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        controls = self.create_controls(panel)
+        buttons = self.create_buttons(panel)
+        #line = wx.StaticLine(panel, -1)
+        sizer.AddStretchSpacer(1)
+        sizer.Add(controls, 0, wx.ALIGN_CENTER_HORIZONTAL|wx.ALL, 10)
+        sizer.AddStretchSpacer(1)
+        #sizer.Add(line, 0, wx.EXPAND)
+        sizer.Add(buttons, 0, wx.EXPAND|wx.ALL&~wx.TOP, 10)
+        panel.SetSizerAndFit(sizer)
+        return panel
+    def create_controls(self, parent):
+        sizer = wx.GridBagSizer(8, 8)
+        label = wx.StaticText(parent, -1, 'Username')
+        username = wx.TextCtrl(parent, -1, '', size=(150, -1))
+        username.Bind(wx.EVT_TEXT, self.on_text)
+        sizer.Add(label, (0, 0), flag=wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT)
+        sizer.Add(username, (0, 1))
+        self.username = username
+        label = wx.StaticText(parent, -1, 'Password')
+        password = wx.TextCtrl(parent, -1, '', size=(150, -1), style=wx.TE_PASSWORD)
+        password.Bind(wx.EVT_TEXT, self.on_text)
+        sizer.Add(label, (1, 0), flag=wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT)
+        sizer.Add(password, (1, 1))
+        self.password = password
+        return sizer
+    def create_buttons(self, parent):
+        ok = wx.Button(parent, wx.ID_OK, 'OK')
+        cancel = wx.Button(parent, wx.ID_CANCEL, 'Cancel')
+        ok.SetDefault()
+        ok.Disable()
+        self.ok = ok
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        sizer.AddStretchSpacer(1)
+        sizer.Add(ok)
+        sizer.AddSpacer(8)
+        sizer.Add(cancel)
+        return sizer
+    def validate(self):
+        if self.username.GetValue() and self.password.GetValue():
+            self.ok.Enable()
+        else:
+            self.ok.Disable()
+    def on_text(self, event):
+        self.validate()
+        
 class EditFeedDialog(wx.Dialog):
     def __init__(self, parent, feed, add=False):
         title = 'Add RSS/Atom Feed' if add else 'Edit RSS/Atom Feed'

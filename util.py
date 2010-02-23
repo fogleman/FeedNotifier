@@ -4,6 +4,7 @@ import re
 import time
 import calendar
 import urllib2
+import urlparse
 import threading
 from htmlentitydefs import name2codepoint
 from settings import settings
@@ -59,6 +60,16 @@ def abspath(path):
     path = os.path.abspath(path)
     path = 'file:///%s' % path.replace('\\', '/')
     return path
+    
+def insert_credentials(url, username, password):
+    parts = urlparse.urlsplit(url)
+    netloc = parts.netloc
+    if '@' in netloc:
+        netloc = netloc[netloc.index('@')+1:]
+    netloc = '%s:%s@%s' % (username, password, netloc)
+    parts = list(parts)
+    parts[1] = netloc
+    return urlparse.urlunsplit(tuple(parts))
     
 def get_proxy():
     if settings.USE_PROXY:
