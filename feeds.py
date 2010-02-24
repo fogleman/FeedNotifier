@@ -6,17 +6,13 @@ import urlparse
 import urllib2
 import random
 import util
+import threading
+import Queue
 import cPickle as pickle
 from settings import settings
 
 def cmp_timestamp(a, b):
     return cmp(a.timestamp, b.timestamp)
-    
-def cmp_received(a, b):
-    n = cmp(a.received, b.received)
-    if n != 0:
-        return n
-    return cmp_timestamp(a, b)
     
 def create_id(entry):
     keys = ['id', 'link', 'title']
@@ -114,9 +110,9 @@ class Feed(object):
         now = int(time.time())
         duration = now - self.last_poll
         return duration >= self.interval
-    def poll(self):
+    def poll(self, timestamp):
         result = []
-        self.last_poll = int(time.time())
+        self.last_poll = timestamp
         d = util.parse(self.url, self.username, self.password, self.etag, self.modified)
         self.etag = util.get(d, 'etag', None)
         self.modified = util.get(d, 'modified', None)
@@ -153,18 +149,38 @@ class FeedManager(object):
     def should_poll(self):
         return any(feed.should_poll() for feed in self.feeds)
     def poll(self):
-        feeds = list(self.feeds)
-        random.shuffle(feeds)
+        now = int(time.time())
+        jobs = Queue.Queue()
+        results = Queue.Queue()
+        feeds = [feed for feed in self.feeds if feed.should_poll()]
         for feed in feeds:
-            if not feed.should_poll():
-                continue
-            items = feed.poll()
-            if not items:
-                continue
-            if not feed.has_favicon:
-                feed.download_favicon()
-            items.sort(cmp=cmp_timestamp)
-            yield items
+            jobs.put(feed)
+        count = len(feeds)
+        for i in range(min(count, settings.MAX_WORKER_THREADS)):
+            thread = threading.Thread(target=self.worker, args=(now, jobs, results))
+            thread.setDaemon(True)
+            thread.start()
+        while count:
+            items = results.get()
+            count -= 1
+            if items:
+                yield items
+    def worker(self, now, jobs, results):
+        while True:
+            try:
+                feed = jobs.get(False)
+            except Queue.Empty:
+                break
+            try:
+                items = feed.poll(now)
+                items.sort(cmp=cmp_timestamp)
+                if items and not feed.has_favicon:
+                    feed.download_favicon()
+                results.put(items)
+                jobs.task_done()
+            except Exception:
+                results.put([])
+                jobs.task_done()
     def purge_items(self, max_age):
         now = int(time.time())
         for item in list(self.items):
