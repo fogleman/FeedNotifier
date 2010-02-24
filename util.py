@@ -6,6 +6,7 @@ import calendar
 import urllib2
 import urlparse
 import threading
+import feedparser
 from htmlentitydefs import name2codepoint
 from settings import settings
 
@@ -60,6 +61,19 @@ def abspath(path):
     path = os.path.abspath(path)
     path = 'file:///%s' % path.replace('\\', '/')
     return path
+    
+def parse(url, username=None, password=None, etag=None, modified=None):
+    agent = settings.USER_AGENT
+    handlers = get_proxy()
+    if username and password:
+        url = insert_credentials(url, username, password)
+    return feedparser.parse(url, etag=etag, modified=modified, agent=agent, handlers=handlers)
+    
+def is_valid_feed(data):
+    entries = get(data, 'entries', [])
+    title = get(data.feed, 'title', '')
+    link = get(data.feed, 'link', '')
+    return entries or (title and link)
     
 def insert_credentials(url, username, password):
     parts = urlparse.urlsplit(url)

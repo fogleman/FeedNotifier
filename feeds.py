@@ -1,4 +1,3 @@
-import feedparser
 import os
 import time
 import calendar
@@ -46,6 +45,8 @@ class Feed(object):
     def __init__(self, url):
         self.uuid = uuid.uuid4().hex
         self.url = url
+        self.username = None
+        self.password = None
         self.enabled = True
         self.last_poll = 0
         self.interval = settings.DEFAULT_POLLING_INTERVAL
@@ -116,7 +117,7 @@ class Feed(object):
     def poll(self):
         result = []
         self.last_poll = int(time.time())
-        d = feedparser.parse(self.url, etag=self.etag, modified=self.modified, agent=settings.USER_AGENT, handlers=util.get_proxy())
+        d = util.parse(self.url, self.username, self.password, self.etag, self.modified)
         self.etag = util.get(d, 'etag', None)
         self.modified = util.get(d, 'modified', None)
         feed = util.get(d, 'feed', None)
@@ -177,11 +178,16 @@ class FeedManager(object):
         except Exception:
             self.feeds, self.items = [], []
         # backward compatibility
+        attributes = {
+            'clicks': 0,
+            'item_count': 0,
+            'username': None,
+            'password': None,
+        }
         for feed in self.feeds:
-            if not hasattr(feed, 'clicks'):
-                feed.clicks = 0
-            if not hasattr(feed, 'item_count'):
-                feed.item_count = 0
+            for name, value in attributes.iteritems():
+                if not hasattr(feed, name):
+                    setattr(feed, name, value)
     def save(self, path='feeds.dat'):
         with open(path, 'wb') as output:
             data = (self.feeds, self.items)
