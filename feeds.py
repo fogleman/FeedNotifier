@@ -183,9 +183,10 @@ class FeedManager(object):
                 jobs.task_done()
     def purge_items(self, max_age):
         now = int(time.time())
+        feeds = set(self.feeds)
         for item in list(self.items):
             age = now - item.received
-            if age > max_age:
+            if age > max_age or item.feed not in feeds:
                 self.items.remove(item)
     def load(self, path='feeds.dat'):
         try:
