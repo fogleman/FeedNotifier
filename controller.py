@@ -71,14 +71,13 @@ class Controller(object):
         self.frame.icon.set_icon('icons/feed_go.png')
         util.start_thread(self._poll_thread)
     def _poll_thread(self):
+        found_new = False
         try:
-            found_new = False
             for new_items in self.manager.poll():
                 found_new = True
                 wx.CallAfter(self._poll_result, new_items)
-            wx.CallAfter(self._poll_complete, found_new)
         finally:
-            self.polling = False
+            wx.CallAfter(self._poll_complete, found_new)
     def _poll_result(self, new_items):
         items = self.manager.items
         if self.popup:
@@ -90,6 +89,7 @@ class Controller(object):
     def _poll_complete(self, found_new):
         if found_new:
             self.save()
+        self.polling = False
         self.frame.icon.set_icon('icons/feed.png')
     def force_poll(self):
         for feed in self.manager.feeds:
