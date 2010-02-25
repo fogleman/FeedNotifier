@@ -2,6 +2,7 @@ import wx
 import os
 import re
 import time
+import base64
 import calendar
 import urllib2
 import urlparse
@@ -84,6 +85,12 @@ def insert_credentials(url, username, password):
     parts = list(parts)
     parts[1] = netloc
     return urlparse.urlunsplit(tuple(parts))
+    
+def encode_password(password):
+    return base64.b64encode(password) if password else None
+    
+def decode_password(password):
+    return base64.b64decode(password) if password else None
     
 def get_proxy():
     if settings.USE_PROXY:

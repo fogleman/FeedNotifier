@@ -113,7 +113,9 @@ class Feed(object):
     def poll(self, timestamp):
         result = []
         self.last_poll = timestamp
-        d = util.parse(self.url, self.username, self.password, self.etag, self.modified)
+        username = util.decode_password(self.username)
+        password = util.decode_password(self.password)
+        d = util.parse(self.url, username, password, self.etag, self.modified)
         self.etag = util.get(d, 'etag', None)
         self.modified = util.get(d, 'modified', None)
         feed = util.get(d, 'feed', None)

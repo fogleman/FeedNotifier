@@ -79,8 +79,8 @@ class AddFeedDialog(wx.Dialog):
             feed = feeds.Feed(url)
             feed.title = util.get(data.feed, 'title', '')
             feed.link = util.get(data.feed, 'link', '')
-            feed.username = data.username
-            feed.password = data.password
+            feed.username = util.encode_password(data.username)
+            feed.password = util.encode_password(data.password)
             feed.interval = util.guess_polling_interval(entries)
             window = EditFeedDialog(parent, feed, True)
             window.Center()
