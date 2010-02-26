@@ -76,7 +76,10 @@ class Frame(wx.Frame):
         return panel
     def create_feed(self, parent, icon_width):
         width = settings.POPUP_WIDTH - 64 - icon_width
-        link = controls.Link(parent, width, self.item.feed.link, self.item.feed.title)
+        if self.item.feed.link:
+            link = controls.Link(parent, width, self.item.feed.link, self.item.feed.title)
+        else:
+            link = controls.Text(parent, width, self.item.feed.title)
         link.SetBackgroundColour(wx.Colour(*BACKGROUND))
         font = link.GetFont()
         font.SetWeight(wx.BOLD)
@@ -94,7 +97,10 @@ class Frame(wx.Frame):
         return sizer
     def create_body(self, parent):
         width = settings.POPUP_WIDTH - 28
-        link = controls.Link(parent, width, self.item.link, self.item.title)
+        if self.item.link:
+            link = controls.Link(parent, width, self.item.link, self.item.title)
+        else:
+            link = controls.Text(parent, width, self.item.title)
         link.SetBackgroundColour(wx.WHITE)
         font = link.GetFont()
         font.SetWeight(wx.BOLD)
