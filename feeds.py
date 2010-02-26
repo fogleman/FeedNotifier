@@ -7,6 +7,7 @@ import urllib2
 import random
 import util
 import Queue
+import logging
 import cPickle as pickle
 from settings import settings
 
@@ -107,6 +108,7 @@ class Feed(object):
         duration = now - self.last_poll
         return duration >= self.interval
     def poll(self, timestamp):
+        logging.info('Polling feed "%s"' % self.url)
         result = []
         self.last_poll = timestamp
         username = util.decode_password(self.username)
@@ -141,8 +143,10 @@ class FeedManager(object):
         self.feeds = []
         self.items = []
     def add_feed(self, feed):
+        logging.info('Adding feed "%s"' % feed.url)
         self.feeds.append(feed)
     def remove_feed(self, feed):
+        logging.info('Removing feed "%s"' % feed.url)
         self.feeds.remove(feed)
     def should_poll(self):
         return any(feed.should_poll() for feed in self.feeds)
@@ -154,6 +158,7 @@ class FeedManager(object):
         for feed in feeds:
             jobs.put(feed)
         count = len(feeds)
+        logging.info('Starting worker threads')
         for i in range(min(count, settings.MAX_WORKER_THREADS)):
             util.start_thread(self.worker, now, jobs, results)
         while count:
@@ -161,6 +166,7 @@ class FeedManager(object):
             count -= 1
             if items:
                 yield items
+        logging.info('Worker threads completed')
     def worker(self, now, jobs, results):
         while True:
             try:
@@ -185,6 +191,7 @@ class FeedManager(object):
             if age > max_age or item.feed not in feeds:
                 self.items.remove(item)
     def load(self, path='feeds.dat'):
+        logging.info('Loading feed data from "%s"' % path)
         try:
             with open(path, 'rb') as input:
                 self.feeds, self.items = pickle.load(input)
@@ -202,12 +209,15 @@ class FeedManager(object):
                 if not hasattr(feed, name):
                     setattr(feed, name, value)
     def save(self, path='feeds.dat'):
+        logging.info('Saving feed data to "%s"' % path)
         with open(path, 'wb') as output:
             data = (self.feeds, self.items)
             pickle.dump(data, output, -1)
     def clear_item_history(self):
+        logging.info('Clearing item history')
         del self.items[:]
     def clear_feed_cache(self):
+        logging.info('Clearing feed caches')
         for feed in self.feeds:
             feed.clear_cache()
             
