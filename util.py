@@ -137,7 +137,9 @@ def guess_polling_interval(entries):
         60*60*24,
     ]
     desired = mean / 2
-    if desired < choices[0]:
+    if desired == 0:
+        interval = settings.DEFAULT_POLLING_INTERVAL
+    elif desired < choices[0]:
         interval = choices[0]
     else:
         interval = max(choice for choice in choices if choice <= desired)
@@ -217,7 +219,7 @@ def replace_entities2(text):
     
 def remove_markup(text):
     html = re.compile(r'<[^>]+>')
-    return html.sub('', text)
+    return html.sub(' ', text)
     
 def format(text, max_length=400):
     previous = ''
