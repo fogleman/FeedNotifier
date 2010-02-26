@@ -16,11 +16,8 @@ def cmp_timestamp(a, b):
     
 def create_id(entry):
     keys = ['id', 'link', 'title']
-    for key in keys:
-        value = util.get(entry, key, None)
-        if value:
-            return value
-    return uuid.uuid4().hex
+    values = tuple(util.get(entry, key, None) for key in keys)
+    return values if any(values) else uuid.uuid4().hex
     
 class Item(object):
     def __init__(self, feed, id):
@@ -123,7 +120,7 @@ class Feed(object):
             self.title = self.title or util.get(feed, 'title', '')
             self.link = self.link or util.get(feed, 'link', self.url)
         entries = util.get(d, 'entries', [])
-        for entry in entries:
+        for entry in reversed(entries):
             id = create_id(entry)
             if id in self.id_set:
                 continue
