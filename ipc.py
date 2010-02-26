@@ -53,7 +53,7 @@ if sys.platform == 'win32':
                         callback_func(message)
                     else:
                         error = True
-            except:
+            except Exception:
                 error = True
             finally:
                 win32pipe.DisconnectNamedPipe(handle)

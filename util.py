@@ -204,7 +204,7 @@ def replace_entities1(text):
     def func(match):
         try:
             return unichr(int(match.group(1)))
-        except:
+        except Exception:
             return match.group(0)
     return entity.sub(func, text)
     
@@ -213,7 +213,7 @@ def replace_entities2(text):
     def func(match):
         try:
             return unichr(name2codepoint[match.group(1)])
-        except:
+        except Exception:
             return match.group(0)
     return entity.sub(func, text)
     

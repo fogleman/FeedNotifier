@@ -6,7 +6,6 @@ import urlparse
 import urllib2
 import random
 import util
-import threading
 import Queue
 import cPickle as pickle
 from settings import settings
@@ -156,9 +155,7 @@ class FeedManager(object):
             jobs.put(feed)
         count = len(feeds)
         for i in range(min(count, settings.MAX_WORKER_THREADS)):
-            thread = threading.Thread(target=self.worker, args=(now, jobs, results))
-            thread.setDaemon(True)
-            thread.start()
+            util.start_thread(self.worker, now, jobs, results)
         while count:
             items = results.get()
             count -= 1

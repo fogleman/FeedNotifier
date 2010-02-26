@@ -55,7 +55,7 @@ class FileSettings(Settings):
             input = open(self._file, 'rb')
             self._settings = pickle.load(input)
             input.close()
-        except:
+        except Exception:
             self._settings = {}
     def save(self):
         output = open(self._file, 'wb')
