@@ -52,9 +52,10 @@ class Rule(object):
         if self.qualifier & CONTENT:
             strings.append(item.description)
         text = '\n'.join(strings)
+        word = self.word
         if ignore_case:
             text = text.lower()
-            word = self.word.lower()
+            word = word.lower()
         if whole_word:
             text = set(text.split())
         if word in text:
