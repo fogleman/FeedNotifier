@@ -498,6 +498,7 @@ class SettingsDialog(wx.Dialog):
         images.Add(wx.Bitmap('icons/feed32.png'))
         images.Add(wx.Bitmap('icons/comment32.png'))
         images.Add(wx.Bitmap('icons/cog32.png'))
+        images.Add(wx.Bitmap('icons/filter32.png'))
         images.Add(wx.Bitmap('icons/info32.png'))
         notebook = wx.Toolbook(parent, -1)
         notebook.SetInternalBorder(0)
@@ -505,11 +506,13 @@ class SettingsDialog(wx.Dialog):
         feeds = FeedsPanel(notebook, self)
         popups = PopupsPanel(notebook, self)
         options = OptionsPanel(notebook, self)
+        filters = FiltersPanel(notebook, self)
         about = AboutPanel(notebook)
         notebook.AddPage(feeds, 'Feeds', imageId=0)
         notebook.AddPage(popups, 'Pop-ups', imageId=1)
         notebook.AddPage(options, 'Options', imageId=2)
-        notebook.AddPage(about, 'About', imageId=3)
+        notebook.AddPage(filters, 'Filters', imageId=3)
+        notebook.AddPage(about, 'About', imageId=4)
         self.popups = popups
         self.options = options
         notebook.Fit()
@@ -992,6 +995,12 @@ class OptionsPanel(wx.Panel):
     def on_check_now(self, event):
         self.check_now.Disable()
         self.model.controller.check_for_updates()
+        
+class FiltersPanel(wx.Panel):
+    def __init__(self, parent, dialog):
+        super(FiltersPanel, self).__init__(parent, -1)
+        self.dialog = dialog
+        self.model = dialog.model
         
 class AboutPanel(wx.Panel):
     def __init__(self, parent):

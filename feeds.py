@@ -5,6 +5,7 @@ import uuid
 import urlparse
 import urllib2
 import random
+import filters
 import util
 import Queue
 import logging
