@@ -10,6 +10,11 @@ INDEX_INTERVAL = 3
 INDEX_ITEM_COUNT = 4
 INDEX_CLICKS = 5
 
+INDEX_RULES = 1
+INDEX_FEEDS = 2
+INDEX_IN = 3
+INDEX_OUT = 4
+
 class TaskBarIcon(wx.TaskBarIcon):
     def __init__(self, controller):
         super(TaskBarIcon, self).__init__()
@@ -394,15 +399,54 @@ class EditFeedDialog(wx.Dialog):
         self.feed.interval = interval
         self.EndModal(wx.ID_OK)
         
+class EditFilterDialog(wx.Dialog):
+    def __init__(self, parent, filter=None):
+        title = 'Edit Filter' if filter else 'Add Filter'
+        super(EditFilterDialog, self).__init__(parent, -1, title)
+        self.filter = filter or feeds.Filter('')
+        panel = self.create_panel(self)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(panel, 1, wx.EXPAND|wx.ALL, 8)
+        self.SetSizer(sizer)
+    def create_panel(self, parent):
+        panel = wx.Panel(parent, -1)
+        rules = self.create_rules(panel)
+        options = self.create_options(panel)
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        sizer.Add(rules, 0, wx.EXPAND)
+        sizer.AddSpacer(8)
+        sizer.Add(options, 0, wx.EXPAND)
+        panel.SetSizer(sizer)
+        return panel
+    def create_rules(self, parent):
+        filter = self.filter
+        box = wx.StaticBox(parent, -1, 'Filter Rules')
+        box = wx.StaticBoxSizer(box, wx.VERTICAL)
+        code = wx.TextCtrl(parent, -1, filter.code, style=wx.TE_MULTILINE)
+        box.Add(code)
+        return box
+    def create_options(self, parent):
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        box = wx.StaticBox(parent, -1, 'Options')
+        box = wx.StaticBoxSizer(box, wx.VERTICAL)
+        sizer.Add(box, 0, wx.EXPAND)
+        box = wx.StaticBox(parent, -1, 'Apply Filter To')
+        box = wx.StaticBoxSizer(box, wx.VERTICAL)
+        sizer.Add(box, 1, wx.EXPAND)
+        return sizer
+        
 class Model(object):
     def __init__(self, controller):
         self.controller = controller
         self.reset()
     def reset(self):
-        self._sort_column = -1
+        self._feed_sort = -1
         feeds = self.controller.manager.feeds
         feeds = [feed.make_copy() for feed in feeds]
         self.feeds = feeds
+        filters = self.controller.manager.filters
+        filters = [filter.make_copy() for filter in filters]
+        self.filters = filters
         self.settings = {}
     def __getattr__(self, key):
         if key != key.upper():
@@ -416,6 +460,7 @@ class Model(object):
         self.settings[key] = value
     def apply(self):
         self.apply_feeds()
+        self.apply_filters()
         self.apply_settings()
         self.controller.save()
     def apply_settings(self):
@@ -444,6 +489,29 @@ class Model(object):
             a = before[uuid]
             b = after[uuid]
             a.copy_from(b)
+    def apply_filters(self):
+        before = {}
+        after = {}
+        controller = self.controller
+        for filter in controller.manager.filters:
+            before[filter.uuid] = filter
+        for filter in self.filters:
+            after[filter.uuid] = filter
+        before_set = set(before.keys())
+        after_set = set(after.keys())
+        added = after_set - before_set
+        deleted = before_set - after_set
+        same = after_set & before_set
+        for uuid in added:
+            filter = after[uuid]
+            controller.manager.add_filter(filter)
+        for uuid in deleted:
+            filter = before[uuid]
+            controller.manager.remove_filter(filter)
+        for uuid in same:
+            a = before[uuid]
+            b = after[uuid]
+            a.copy_from(b)
     def sort_feeds(self, column):
         def cmp_enabled(a, b):
             return cmp(a.enabled, b.enabled)
@@ -466,11 +534,11 @@ class Model(object):
             INDEX_ITEM_COUNT: cmp_item_count,
         }
         self.feeds.sort(cmp=funcs[column])
-        if column == self._sort_column:
+        if column == self._feed_sort:
             self.feeds.reverse()
-            self._sort_column = -1
+            self._feed_sort = -1
         else:
-            self._sort_column = column
+            self._feed_sort = column
             
 class SettingsDialog(wx.Dialog):
     def __init__(self, parent, controller):
@@ -509,9 +577,9 @@ class SettingsDialog(wx.Dialog):
         filters = FiltersPanel(notebook, self)
         about = AboutPanel(notebook)
         notebook.AddPage(feeds, 'Feeds', imageId=0)
+        notebook.AddPage(filters, 'Filters', imageId=3)
         notebook.AddPage(popups, 'Pop-ups', imageId=1)
         notebook.AddPage(options, 'Options', imageId=2)
-        notebook.AddPage(filters, 'Filters', imageId=3)
         notebook.AddPage(about, 'About', imageId=4)
         self.popups = popups
         self.options = options
@@ -605,6 +673,61 @@ class FeedsList(wx.ListCtrl):
             return str(feed.clicks) if feed.clicks else ''
         if column == INDEX_ITEM_COUNT:
             return str(feed.item_count) if feed.item_count else ''
+        return ''
+        
+class FiltersList(wx.ListCtrl):
+    def __init__(self, parent, dialog):
+        style = wx.LC_REPORT|wx.LC_VIRTUAL#|wx.LC_HRULES|wx.LC_VRULES
+        super(FiltersList, self).__init__(parent, -1, style=style)
+        self.dialog = dialog
+        self.model = dialog.model
+        images = wx.ImageList(16, 16, True)
+        images.AddWithColourMask(wx.Bitmap('icons/unchecked.png'), wx.WHITE)
+        images.AddWithColourMask(wx.Bitmap('icons/checked.png'), wx.WHITE)
+        self.AssignImageList(images, wx.IMAGE_LIST_SMALL)
+        self.InsertColumn(INDEX_ENABLED, 'Enabled')
+        self.InsertColumn(INDEX_RULES, 'Filter Rules')
+        self.InsertColumn(INDEX_FEEDS, 'Feeds')
+        self.InsertColumn(INDEX_IN, 'In')
+        self.InsertColumn(INDEX_OUT, 'Out')
+        self.Bind(wx.EVT_LEFT_DOWN, self.on_left_down)
+        self.Bind(wx.EVT_LIST_COL_CLICK, self.on_col_click)
+        self.update()
+        self.SetColumnWidth(INDEX_ENABLED, -1)
+        self.SetColumnWidth(INDEX_RULES, 200)
+        self.SetColumnWidth(INDEX_FEEDS, 64)
+        self.SetColumnWidth(INDEX_IN, 64)
+        self.SetColumnWidth(INDEX_OUT, 64)
+    def update(self):
+        self.SetItemCount(len(self.model.filters))
+        self.Refresh()
+    def on_col_click(self, event):
+        column = event.GetColumn()
+        self.model.sort_filters(column)
+        self.update()
+    def on_left_down(self, event):
+        index, flags = self.HitTest(event.GetPosition())
+        if index >= 0 and (flags & wx.LIST_HITTEST_ONITEMICON):
+            self.toggle(index)
+        event.Skip()
+    def toggle(self, index):
+        filter = self.model.filters[index]
+        filter.enabled = not filter.enabled
+        self.RefreshItem(index)
+        self.dialog.on_change()
+    def OnGetItemImage(self, index):
+        filter = self.model.filters[index]
+        return 1 if filter.enabled else 0
+    def OnGetItemText(self, index, column):
+        filter = self.model.filters[index]
+        if column == INDEX_RULES:
+            return filter.code.replace('\n', ' ')
+        if column == INDEX_FEEDS:
+            return str(len(filter.feeds)) if filter.feeds else 'All'
+        if column == INDEX_IN:
+            return str(filter.inputs)
+        if column == INDEX_OUT:
+            return str(filter.outputs)
         return ''
         
 class FeedsPanel(wx.Panel):
@@ -706,6 +829,108 @@ class FeedsPanel(wx.Panel):
         if feeds:
             for feed in feeds:
                 self.model.feeds.remove(feed)
+            self.update()
+            
+class FiltersPanel(wx.Panel):
+    def __init__(self, parent, dialog):
+        super(FiltersPanel, self).__init__(parent, -1)
+        self.dialog = dialog
+        self.model = dialog.model
+        panel = self.create_panel(self)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        line = wx.StaticLine(self, -1)
+        sizer.Add(line, 0, wx.EXPAND)
+        sizer.Add(panel, 1, wx.EXPAND|wx.ALL, 8)
+        self.SetSizerAndFit(sizer)
+    def create_panel(self, parent):
+        panel = wx.Panel(parent, -1)
+        list = FiltersList(panel, self.dialog)
+        list.Bind(wx.EVT_LIST_ITEM_SELECTED, self.on_selection)
+        list.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.on_selection)
+        list.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.on_edit)
+        list.Bind(wx.EVT_LEFT_DOWN, self.on_left_down)
+        self.list = list
+        buttons = self.create_buttons(panel)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(list, 1, wx.EXPAND)
+        sizer.AddSpacer(8)
+        sizer.Add(buttons, 0, wx.EXPAND)
+        panel.SetSizerAndFit(sizer)
+        return panel
+    def create_buttons(self, parent):
+        new = wx.Button(parent, -1, 'Add...')
+        edit = wx.Button(parent, -1, 'Edit...')
+        delete = wx.Button(parent, -1, 'Delete')
+        new.Bind(wx.EVT_BUTTON, self.on_new)
+        edit.Bind(wx.EVT_BUTTON, self.on_edit)
+        delete.Bind(wx.EVT_BUTTON, self.on_delete)
+        edit.Disable()
+        delete.Disable()
+        self.edit = edit
+        self.delete = delete
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        sizer.Add(new)
+        sizer.AddSpacer(8)
+        sizer.Add(edit)
+        sizer.AddSpacer(8)
+        sizer.Add(delete)
+        sizer.AddStretchSpacer(1)
+        return sizer
+    def update(self):
+        self.list.update()
+        self.update_buttons()
+        self.dialog.on_change()
+    def on_selection(self, event):
+        event.Skip()
+        self.update_buttons()
+    def update_buttons(self):
+        count = self.list.GetSelectedItemCount()
+        self.edit.Enable(count == 1)
+        self.delete.Enable(count > 0)
+    def on_left_down(self, event):
+        index, flags = self.list.HitTest(event.GetPosition())
+        if flags & wx.LIST_HITTEST_NOWHERE:
+            self.edit.Disable()
+            self.delete.Disable()
+        event.Skip()
+    def on_edit(self, event):
+        count = self.list.GetSelectedItemCount()
+        if count != 1:
+            return
+        index = self.list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
+        filter = self.model.filters[index]
+        window = EditFilterDialog(self, filter)
+        window.CenterOnScreen()
+        result = window.ShowModal()
+        window.Destroy()
+        if result == wx.ID_OK:
+            self.update()
+    def on_new(self, event):
+        window = EditFilterDialog(self)
+        window.CenterOnScreen()
+        result = window.ShowModal()
+        filter = window.filter
+        window.Destroy()
+        if result == wx.ID_OK:
+            self.model.filters.append(filter)
+            self.update()
+    def on_delete(self, event):
+        dialog = wx.MessageDialog(self.dialog, 'Are you sure you want to delete the selected filter(s)?', 'Confirm Delete', wx.YES_NO|wx.NO_DEFAULT|wx.ICON_QUESTION)
+        result = dialog.ShowModal()
+        dialog.Destroy()
+        if result != wx.ID_YES:
+            return
+        filters = []
+        index = -1
+        while True:
+            index = self.list.GetNextItem(index, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
+            if index < 0:
+                break
+            filter = self.model.filters[index]
+            filters.append(filter)
+        if filters:
+            for filter in filters:
+                self.model.filters.remove(filter)
             self.update()
             
 class PopupsPanel(wx.Panel):
@@ -995,12 +1220,6 @@ class OptionsPanel(wx.Panel):
     def on_check_now(self, event):
         self.check_now.Disable()
         self.model.controller.check_for_updates()
-        
-class FiltersPanel(wx.Panel):
-    def __init__(self, parent, dialog):
-        super(FiltersPanel, self).__init__(parent, -1)
-        self.dialog = dialog
-        self.model = dialog.model
         
 class AboutPanel(wx.Panel):
     def __init__(self, parent):

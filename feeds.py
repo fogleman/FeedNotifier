@@ -150,6 +150,16 @@ class Filter(object):
         self.feeds = set(feeds) if feeds else set()
         self.inputs = 0
         self.outputs = 0
+    def make_copy(self):
+        filter = Filter(self.code, self.ignore_case, self.whole_word, self.feeds)
+        for key in ['uuid', 'enabled', 'inputs', 'outputs']:
+            value = getattr(self, key)
+            setattr(filter, key, value)
+        return filter
+    def copy_from(self, filter):
+        for key in ['enabled', 'code', 'ignore_case', 'whole_word', 'feeds']:
+            value = getattr(filter, key)
+            setattr(self, key, value)
     def filter(self, item):
         if self.feeds and item.feed not in self.feeds:
             return True
@@ -172,6 +182,12 @@ class FeedManager(object):
     def remove_feed(self, feed):
         logging.info('Removing feed "%s"' % feed.url)
         self.feeds.remove(feed)
+    def add_filter(self, filter):
+        logging.info('Adding filter "%s"' % filter.code)
+        self.filters.append(filter)
+    def remove_filter(self, filter):
+        logging.info('Removing filter "%s"' % filter.code)
+        self.filters.remove(filter)
     def should_poll(self):
         return any(feed.should_poll() for feed in self.feeds)
     def poll(self):
