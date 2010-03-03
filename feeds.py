@@ -108,7 +108,7 @@ class Feed(object):
         now = int(time.time())
         duration = now - self.last_poll
         return duration >= self.interval
-    def poll(self, timestamp):
+    def poll(self, timestamp, filters):
         logging.info('Polling feed "%s"' % self.url)
         result = []
         self.last_poll = timestamp
@@ -135,14 +135,37 @@ class Feed(object):
             item.description = util.format(util.get(entry, 'description', ''), settings.POPUP_BODY_LENGTH)
             item.link = util.get(entry, 'link', '')
             item.author = util.format(util.get(entry, 'author', '')) # TODO: max length
-            result.append(item)
+            if all(filter.filter(item) for filter in filters):
+                result.append(item)
         self.clean_cache(settings.FEED_CACHE_SIZE)
         return result
         
+class Filter(object):
+    def __init__(self, code, ignore_case=True, whole_word=True, feeds=None):
+        self.uuid = uuid.uuid4().hex
+        self.enabled = True
+        self.code = code
+        self.ignore_case = ignore_case
+        self.whole_word = whole_word
+        self.feeds = set(feeds) if feeds else set()
+        self.inputs = 0
+        self.outputs = 0
+    def filter(self, item):
+        if self.feeds and item.feed not in self.feeds:
+            return True
+        self.inputs += 1
+        rule = filters.parse(self.code) # TODO: cache parsed rules
+        if rule.evaluate(item, self.ignore_case, self.whole_word):
+            self.outputs += 1
+            return True
+        else:
+            return False
+            
 class FeedManager(object):
     def __init__(self):
         self.feeds = []
         self.items = []
+        self.filters = []
     def add_feed(self, feed):
         logging.info('Adding feed "%s"' % feed.url)
         self.feeds.append(feed)
@@ -175,7 +198,7 @@ class FeedManager(object):
             except Queue.Empty:
                 break
             try:
-                items = feed.poll(now)
+                items = feed.poll(now, self.filters)
                 items.sort(cmp=cmp_timestamp)
                 if items and not feed.has_favicon:
                     feed.download_favicon()
@@ -195,10 +218,15 @@ class FeedManager(object):
         logging.info('Loading feed data from "%s"' % path)
         try:
             with open(path, 'rb') as input:
-                self.feeds, self.items = pickle.load(input)
+                data = pickle.load(input)
         except Exception:
-            self.feeds, self.items = [], []
+            data = ([], [], [])
         # backward compatibility
+        if len(data) == 2:
+            self.feeds, self.items = data
+            self.filters = []
+        else:
+            self.feeds, self.items, self.filters = data
         attributes = {
             'clicks': 0,
             'item_count': 0,
@@ -212,7 +240,7 @@ class FeedManager(object):
     def save(self, path='feeds.dat'):
         logging.info('Saving feed data to "%s"' % path)
         with open(path, 'wb') as output:
-            data = (self.feeds, self.items)
+            data = (self.feeds, self.items, self.filters)
             pickle.dump(data, output, -1)
     def clear_item_history(self):
         logging.info('Clearing item history')
