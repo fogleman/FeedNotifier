@@ -475,7 +475,8 @@ class EditFilterDialog(wx.Dialog):
         def cmp_title(a, b):
             return cmp(a.title.lower(), b.title.lower())
         self.lookup = {}
-        for index, feed in enumerate(sorted(self.model.feeds, cmp=cmp_title)):
+        items = self.model.controller.manager.feeds
+        for index, feed in enumerate(sorted(items, cmp=cmp_title)):
             feeds.Append(feed.title)
             self.lookup[index] = feed
             feeds.Check(index, feed in self.filter.feeds)
@@ -528,6 +529,7 @@ class Model(object):
         self.reset()
     def reset(self):
         self._feed_sort = -1
+        self._filter_sort = -1
         feeds = self.controller.manager.feeds
         feeds = [feed.make_copy() for feed in feeds]
         self.feeds = feeds
@@ -626,6 +628,30 @@ class Model(object):
             self._feed_sort = -1
         else:
             self._feed_sort = column
+    def sort_filters(self, column):
+        def cmp_enabled(a, b):
+            return cmp(a.enabled, b.enabled)
+        def cmp_rules(a, b):
+            return cmp(a.code, b.code)
+        def cmp_feeds(a, b):
+            return cmp(len(a.feeds), len(b.feeds))
+        def cmp_in(a, b):
+            return cmp(b.inputs, a.inputs)
+        def cmp_out(a, b):
+            return cmp(b.outputs, a.outputs)
+        funcs = {
+            INDEX_ENABLED: cmp_enabled,
+            INDEX_RULES: cmp_rules,
+            INDEX_FEEDS: cmp_feeds,
+            INDEX_IN: cmp_in,
+            INDEX_OUT: cmp_out,
+        }
+        self.filters.sort(cmp=funcs[column])
+        if column == self._filter_sort:
+            self.filters.reverse()
+            self._filter_sort = -1
+        else:
+            self._filter_sort = column
             
 class SettingsDialog(wx.Dialog):
     def __init__(self, parent, controller):
