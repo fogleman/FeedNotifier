@@ -548,8 +548,8 @@ class Model(object):
             return super(Model, self).__setattr__(key, value)
         self.settings[key] = value
     def apply(self):
-        self.apply_feeds()
         self.apply_filters()
+        self.apply_feeds()
         self.apply_settings()
         self.controller.save()
     def apply_settings(self):
