@@ -471,7 +471,7 @@ class EditFilterDialog(wx.Dialog):
         selected_feeds = wx.RadioButton(parent, -1, 'Selected Feeds')
         if self.filter.feeds:
             selected_feeds.SetValue(True)
-        feeds = wx.CheckListBox(parent, -1, size=(150, -1), style=wx.LB_HSCROLL|wx.LB_EXTENDED)
+        feeds = wx.CheckListBox(parent, -1, size=(150, 150), style=wx.LB_HSCROLL|wx.LB_EXTENDED)
         def cmp_title(a, b):
             return cmp(a.title.lower(), b.title.lower())
         self.lookup = {}
@@ -690,9 +690,9 @@ class SettingsDialog(wx.Dialog):
         filters = FiltersPanel(notebook, self)
         about = AboutPanel(notebook)
         notebook.AddPage(feeds, 'Feeds', imageId=0)
-        notebook.AddPage(filters, 'Filters', imageId=3)
         notebook.AddPage(popups, 'Pop-ups', imageId=1)
         notebook.AddPage(options, 'Options', imageId=2)
+        notebook.AddPage(filters, 'Filters', imageId=3)
         notebook.AddPage(about, 'About', imageId=4)
         self.popups = popups
         self.options = options
@@ -748,7 +748,7 @@ class FeedsList(wx.ListCtrl):
         self.Bind(wx.EVT_LEFT_DOWN, self.on_left_down)
         self.Bind(wx.EVT_LIST_COL_CLICK, self.on_col_click)
         self.update()
-        self.SetColumnWidth(INDEX_ENABLED, -1)
+        self.SetColumnWidth(INDEX_ENABLED, 32)
         self.SetColumnWidth(INDEX_URL, 165)
         self.SetColumnWidth(INDEX_TITLE, 165)
         self.SetColumnWidth(INDEX_INTERVAL, 75)
@@ -806,7 +806,7 @@ class FiltersList(wx.ListCtrl):
         self.Bind(wx.EVT_LEFT_DOWN, self.on_left_down)
         self.Bind(wx.EVT_LIST_COL_CLICK, self.on_col_click)
         self.update()
-        self.SetColumnWidth(INDEX_ENABLED, -1)
+        self.SetColumnWidth(INDEX_ENABLED, 32)
         self.SetColumnWidth(INDEX_RULES, 200)
         self.SetColumnWidth(INDEX_FEEDS, 64)
         self.SetColumnWidth(INDEX_IN, 64)
