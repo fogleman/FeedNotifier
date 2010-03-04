@@ -78,10 +78,10 @@ def get_data_files():
 setup(
     options = {"py2exe":{
         "compressed": 1,
-        "optimize": 2,
+        "optimize": 1,
         "bundle_files": 1,
         "skip_scan": ['wx.lib.iewin'],
-        "includes": ['wx.lib.iewin', 'wx.lib.activex', 'comtypes.gen.SHDocVw'],
+        "includes": ['parsetab', 'wx.lib.iewin', 'wx.lib.activex', 'comtypes.gen.SHDocVw'],
     }},
     windows = [{
         "script": "main.py",
