@@ -161,6 +161,8 @@ class Filter(object):
             value = getattr(filter, key)
             setattr(self, key, value)
     def filter(self, item):
+        if not self.enabled:
+            return True
         if self.feeds and item.feed not in self.feeds:
             return True
         self.inputs += 1
