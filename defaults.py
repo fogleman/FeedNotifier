@@ -19,7 +19,7 @@ POPUP_BODY_LENGTH = 400
 # Application Settings
 APP_ID = 'FeedNotifier'
 APP_NAME = 'Feed Notifier'
-APP_VERSION = '2.1'
+APP_VERSION = '2.2'
 APP_URL = 'http://www.feednotifier.com/'
 USER_AGENT = '%s/%s +%s' % (APP_ID, APP_VERSION, APP_URL)
 DEFAULT_POLLING_INTERVAL = 60 * 15
