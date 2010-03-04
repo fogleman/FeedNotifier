@@ -182,6 +182,8 @@ class FeedManager(object):
     def remove_feed(self, feed):
         logging.info('Removing feed "%s"' % feed.url)
         self.feeds.remove(feed)
+        for filter in self.filters:
+            filter.feeds.discard(feed)
     def add_filter(self, filter):
         logging.info('Adding filter "%s"' % filter.code)
         self.filters.append(filter)

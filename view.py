@@ -1,6 +1,7 @@
 import wx
 import util
 import feeds
+import filters
 from settings import settings
 
 INDEX_ENABLED = 0
@@ -400,40 +401,126 @@ class EditFeedDialog(wx.Dialog):
         self.EndModal(wx.ID_OK)
         
 class EditFilterDialog(wx.Dialog):
-    def __init__(self, parent, filter=None):
+    def __init__(self, parent, model, filter=None):
         title = 'Edit Filter' if filter else 'Add Filter'
-        super(EditFilterDialog, self).__init__(parent, -1, title)
+        style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
+        super(EditFilterDialog, self).__init__(parent, -1, title, style=style)
+        self.model = model
         self.filter = filter or feeds.Filter('')
         panel = self.create_panel(self)
+        buttons = self.create_buttons(self)
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(panel, 1, wx.EXPAND|wx.ALL, 8)
-        self.SetSizer(sizer)
+        sizer.Add(buttons, 0, wx.EXPAND|wx.ALL&~wx.TOP, 8)
+        self.SetSizerAndFit(sizer)
+        self.validate()
     def create_panel(self, parent):
         panel = wx.Panel(parent, -1)
         rules = self.create_rules(panel)
         options = self.create_options(panel)
         sizer = wx.BoxSizer(wx.HORIZONTAL)
-        sizer.Add(rules, 0, wx.EXPAND)
+        sizer.Add(rules, 1, wx.EXPAND)
         sizer.AddSpacer(8)
         sizer.Add(options, 0, wx.EXPAND)
         panel.SetSizer(sizer)
         return panel
+    def create_buttons(self, parent):
+        ok = wx.Button(parent, wx.ID_OK, 'OK')
+        cancel = wx.Button(parent, wx.ID_CANCEL, 'Cancel')
+        sizer = wx.BoxSizer(wx.HORIZONTAL)
+        sizer.AddStretchSpacer(1)
+        sizer.Add(ok)
+        sizer.AddSpacer(8)
+        sizer.Add(cancel)
+        ok.SetDefault()
+        ok.Bind(wx.EVT_BUTTON, self.on_ok)
+        self.ok = ok
+        return sizer
     def create_rules(self, parent):
-        filter = self.filter
         box = wx.StaticBox(parent, -1, 'Filter Rules')
         box = wx.StaticBoxSizer(box, wx.VERTICAL)
-        code = wx.TextCtrl(parent, -1, filter.code, style=wx.TE_MULTILINE)
-        box.Add(code)
+        code = wx.TextCtrl(parent, -1, self.filter.code, style=wx.TE_MULTILINE, size=(250, -1))
+        text = '''
+        Examples:
+        -microsoft and -apple (exclude microsoft and apple)
+        google or yahoo (require google or yahoo)
+        -author:BoringGuy (search author field only)
+        '''
+        text = '\n'.join(line.strip() for line in text.strip().split('\n'))
+        help = wx.StaticText(parent, -1, text)
+        box.Add(code, 1, wx.EXPAND|wx.ALL, 8)
+        box.Add(help, 0, wx.EXPAND|wx.ALL&~wx.TOP, 8)
+        code.Bind(wx.EVT_TEXT, self.on_event)
+        self.code = code
         return box
     def create_options(self, parent):
         sizer = wx.BoxSizer(wx.VERTICAL)
         box = wx.StaticBox(parent, -1, 'Options')
         box = wx.StaticBoxSizer(box, wx.VERTICAL)
+        match_case = wx.CheckBox(parent, -1, 'Match Case')
+        match_whole_words = wx.CheckBox(parent, -1, 'Match Whole Words')
+        match_case.SetValue(not self.filter.ignore_case)
+        match_whole_words.SetValue(self.filter.whole_word)
+        box.Add(match_case, 0, wx.ALL, 8)
+        box.Add(match_whole_words, 0, wx.ALL&~wx.TOP, 8)
         sizer.Add(box, 0, wx.EXPAND)
+        sizer.AddSpacer(8)
         box = wx.StaticBox(parent, -1, 'Apply Filter To')
         box = wx.StaticBoxSizer(box, wx.VERTICAL)
+        all_feeds = wx.RadioButton(parent, -1, 'All Feeds', style=wx.RB_GROUP)
+        selected_feeds = wx.RadioButton(parent, -1, 'Selected Feeds')
+        if self.filter.feeds:
+            selected_feeds.SetValue(True)
+        feeds = wx.CheckListBox(parent, -1, size=(150, -1), style=wx.LB_HSCROLL|wx.LB_EXTENDED)
+        def cmp_title(a, b):
+            return cmp(a.title.lower(), b.title.lower())
+        self.lookup = {}
+        for index, feed in enumerate(sorted(self.model.feeds, cmp=cmp_title)):
+            feeds.Append(feed.title)
+            self.lookup[index] = feed
+            feeds.Check(index, feed in self.filter.feeds)
+        box.Add(all_feeds, 0, wx.ALL, 8)
+        box.Add(selected_feeds, 0, wx.ALL&~wx.TOP, 8)
+        box.Add(feeds, 1, wx.ALL&~wx.TOP, 8)
         sizer.Add(box, 1, wx.EXPAND)
+        match_case.Bind(wx.EVT_CHECKBOX, self.on_event)
+        match_whole_words.Bind(wx.EVT_CHECKBOX, self.on_event)
+        all_feeds.Bind(wx.EVT_RADIOBUTTON, self.on_event)
+        selected_feeds.Bind(wx.EVT_RADIOBUTTON, self.on_event)
+        feeds.Bind(wx.EVT_CHECKLISTBOX, self.on_event)
+        self.match_case = match_case
+        self.match_whole_words = match_whole_words
+        self.all_feeds = all_feeds
+        self.selected_feeds = selected_feeds
+        self.feeds = feeds
         return sizer
+    def get_selected_feeds(self):
+        result = set()
+        if self.selected_feeds.GetValue():
+            for index in range(self.feeds.GetCount()):
+                if self.feeds.IsChecked(index):
+                    result.add(self.lookup[index])
+        return result
+    def validate(self):
+        feeds = self.get_selected_feeds()
+        valid = True
+        valid = valid and self.code.GetValue()
+        valid = valid and (self.all_feeds.GetValue() or feeds)
+        try:
+            filters.parse(self.code.GetValue())
+        except Exception:
+            valid = False
+        self.ok.Enable(bool(valid))
+        self.feeds.Enable(self.selected_feeds.GetValue())
+    def on_event(self, event):
+        self.validate()
+    def on_ok(self, event):
+        filter = self.filter
+        filter.code = self.code.GetValue()
+        filter.ignore_case = not self.match_case.GetValue()
+        filter.whole_word = self.match_whole_words.GetValue()
+        filter.feeds = self.get_selected_feeds()
+        event.Skip()
         
 class Model(object):
     def __init__(self, controller):
@@ -899,15 +986,15 @@ class FiltersPanel(wx.Panel):
             return
         index = self.list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
         filter = self.model.filters[index]
-        window = EditFilterDialog(self, filter)
-        window.CenterOnScreen()
+        window = EditFilterDialog(self, self.model, filter)
+        window.Center()
         result = window.ShowModal()
         window.Destroy()
         if result == wx.ID_OK:
             self.update()
     def on_new(self, event):
-        window = EditFilterDialog(self)
-        window.CenterOnScreen()
+        window = EditFilterDialog(self, self.model)
+        window.Center()
         result = window.ShowModal()
         filter = window.filter
         window.Destroy()

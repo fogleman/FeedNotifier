@@ -61,7 +61,7 @@ class Rule(object):
         if word in text:
             return self.type == INCLUDE
         else:
-            return self.type == EXLCUDE
+            return self.type == EXCLUDE
     def __str__(self):
         type = TYPE_STR[self.type]
         qualifier = QUALIFIER_STR[self.qualifier]
