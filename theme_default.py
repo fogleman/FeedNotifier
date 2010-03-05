@@ -19,9 +19,16 @@ class Frame(wx.Frame):
         e = popups.Event(self, popups.EVT_LINK)
         e.link = event.link
         wx.PostEvent(self, e)
+    def on_left_down(self, event):
+        e = popups.Event(self, popups.EVT_LINK)
+        e.link = popups.COMMAND_NEXT
+        wx.PostEvent(self, e)
     def bind_links(self, widgets):
         for widget in widgets:
             widget.Bind(controls.EVT_HYPERLINK, self.on_link)
+    def bind_widgets(self, widgets):
+        for widget in widgets:
+            widget.Bind(wx.EVT_LEFT_DOWN, self.on_left_down)
     def create_container(self, parent):
         panel1 = wx.Panel(parent, -1)
         panel1.SetBackgroundColour(wx.BLACK)
@@ -35,6 +42,7 @@ class Frame(wx.Frame):
         sizer.Add(contents, 1, wx.EXPAND|wx.ALL, 1)
         panel2.SetSizer(sizer)
         panel1.Fit()
+        self.bind_widgets([panel1, panel2])
         return panel1
     def create_contents(self, parent):
         header = self.create_header(parent)
@@ -50,6 +58,7 @@ class Frame(wx.Frame):
         sizer.Add(body, 1, wx.EXPAND)
         sizer.Add(line2, 0, wx.EXPAND)
         sizer.Add(footer, 0, wx.EXPAND)
+        self.bind_widgets([line1, line2])
         return sizer
     def create_header(self, parent):
         panel = wx.Panel(parent, -1)
@@ -73,6 +82,7 @@ class Frame(wx.Frame):
         sizer.Add(button, 0, wx.ALIGN_CENTER|wx.ALL, 10)
         panel.SetSizer(sizer)
         self.bind_links([icon, button])
+        self.bind_widgets([panel])
         return panel
     def create_feed(self, parent, icon_width):
         width = settings.POPUP_WIDTH - 64 - icon_width
@@ -94,6 +104,7 @@ class Frame(wx.Frame):
         sizer.Add(link, 0, wx.EXPAND)
         sizer.Add(info, 0, wx.EXPAND)
         self.bind_links([link])
+        self.bind_widgets([info])
         return sizer
     def create_body(self, parent):
         width = settings.POPUP_WIDTH - 28
@@ -118,6 +129,7 @@ class Frame(wx.Frame):
         sizer.Add(text, 0, wx.EXPAND|wx.LEFT|wx.RIGHT, 10)
         sizer.AddSpacer(10)
         self.bind_links([link])
+        self.bind_widgets([text])
         return sizer
     def create_footer(self, parent):
         panel = wx.Panel(parent, -1)
@@ -153,6 +165,7 @@ class Frame(wx.Frame):
         sizer.Add(pause, 0, wx.TOP|wx.BOTTOM, 5)
         sizer.AddSpacer(10)
         panel.SetSizer(sizer)
+        self.bind_widgets([panel])
         return panel
         
 if __name__ == '__main__':
