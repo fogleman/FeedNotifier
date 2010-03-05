@@ -21,6 +21,10 @@ def scale_bitmap(bitmap, width, height, color):
     bw, bh = bitmap.GetWidth(), bitmap.GetHeight()
     if bw == width and bh == height:
         return bitmap
+    if width < 0:
+        width = bw
+    if height < 0:
+        height = bh
     buffer = wx.EmptyBitmap(bw, bh)
     dc = wx.MemoryDC(buffer)
     dc.SetBackground(wx.Brush(color))
