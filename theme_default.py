@@ -14,15 +14,21 @@ class Frame(wx.Frame):
         self.item = item
         self.context = context
         container = self.create_container(self)
+        container.Bind(wx.EVT_MOUSEWHEEL, self.on_mousewheel)
         self.Fit()
+    def post_link(self, link):
+        event = popups.Event(self, popups.EVT_LINK)
+        event.link = link
+        wx.PostEvent(self, event)
     def on_link(self, event):
-        e = popups.Event(self, popups.EVT_LINK)
-        e.link = event.link
-        wx.PostEvent(self, e)
+        self.post_link(event.link)
     def on_left_down(self, event):
-        e = popups.Event(self, popups.EVT_LINK)
-        e.link = popups.COMMAND_NEXT
-        wx.PostEvent(self, e)
+        self.post_link(popups.COMMAND_NEXT)
+    def on_mousewheel(self, event):
+        if event.GetWheelRotation() < 0:
+            self.post_link(popups.COMMAND_NEXT)
+        else:
+            self.post_link(popups.COMMAND_PREVIOUS)
     def bind_links(self, widgets):
         for widget in widgets:
             widget.Bind(controls.EVT_HYPERLINK, self.on_link)
