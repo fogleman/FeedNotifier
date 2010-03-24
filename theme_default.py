@@ -23,7 +23,7 @@ class Frame(wx.Frame):
     def on_link(self, event):
         self.post_link(event.link)
     def on_left_down(self, event):
-        self.post_link(popups.COMMAND_NEXT)
+        pass #self.post_link(popups.COMMAND_NEXT)
     def on_mousewheel(self, event):
         if event.GetWheelRotation() < 0:
             self.post_link(popups.COMMAND_NEXT)
