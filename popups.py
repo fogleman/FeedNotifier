@@ -77,12 +77,12 @@ class PopupManager(wx.EvtHandler):
         self.timer = None
         self.auto = settings.POPUP_AUTO_PLAY
         self.cache = {}
-    def set_items(self, items, index=0):
+    def set_items(self, items, index=0, focus=False):
         self.items = list(items)
         self.index = index
         self.count = len(self.items)
         self.clear_cache(keep_current_item=True)
-        self.update()
+        self.update(focus)
         self.set_timer()
     def update(self, focus=False):
         item = self.items[self.index]

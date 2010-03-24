@@ -85,7 +85,7 @@ class Controller(object):
         else:
             index = len(items)
         items.extend(new_items)
-        self.show_items(items, index)
+        self.show_items(items, index, False)
     def _poll_complete(self, found_new):
         if found_new:
             self.save()
@@ -95,19 +95,19 @@ class Controller(object):
         for feed in self.manager.feeds:
             feed.last_poll = 0
         self.poll()
-    def show_items(self, items, index, auto=None):
+    def show_items(self, items, index, focus):
         if not items:
             return
         if not self.popup:
             self.popup = popups.PopupManager()
             self.popup.Bind(popups.EVT_POPUP_CLOSE, self.on_popup_close)
-        self.popup.set_items(items, index)
-        if auto is not None:
-            self.popup.auto = auto
+        self.popup.set_items(items, index, focus)
+        if focus:
+            self.popup.auto = False
     def show_popup(self):
         items = self.manager.items
         index = len(items) - 1
-        self.show_items(items, index, False)
+        self.show_items(items, index, True)
     def add_feed(self, url=''):
         feed = view.AddFeedDialog.show_wizard(self.frame, url)
         if not feed:
