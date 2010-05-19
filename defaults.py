@@ -28,6 +28,8 @@ DISABLE_WHEN_IDLE = True
 ITEM_CACHE_AGE = 60 * 60 * 24 * 1
 FEED_CACHE_SIZE = 500
 MAX_WORKER_THREADS = 10
+PLAY_SOUND = True
+SOUND_PATH = 'sounds/notification.wav'
 
 # Initial Setup
 DEFAULT_FEED_URLS = [

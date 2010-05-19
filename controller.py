@@ -6,6 +6,7 @@ import view
 import socket
 import updater
 import util
+import winsound
 from settings import settings
 
 INVALID_ADDRESSES = [
@@ -96,14 +97,27 @@ class Controller(object):
             feed.last_poll = 0
         self.poll()
     def show_items(self, items, index, focus):
+        play_sound = False
         if not items:
             return
         if not self.popup:
             self.popup = popups.PopupManager()
             self.popup.Bind(popups.EVT_POPUP_CLOSE, self.on_popup_close)
+            if not focus:
+                play_sound = True
         self.popup.set_items(items, index, focus)
         if focus:
             self.popup.auto = False
+        if play_sound:
+            self.play_sound()
+    def play_sound(self):
+        if settings.PLAY_SOUND:
+            path = settings.SOUND_PATH
+            flags = winsound.SND_FILENAME | winsound.SND_ASYNC
+            try:
+                winsound.PlaySound(path, flags)
+            except Exception:
+                pass
     def show_popup(self):
         items = self.manager.items
         index = len(items) - 1
