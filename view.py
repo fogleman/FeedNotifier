@@ -1122,17 +1122,21 @@ class PopupsPanel(wx.Panel):
         grid.Add(text, (0, 2), flag=wx.ALIGN_CENTER_VERTICAL)
         
         duration = wx.SpinCtrl(parent, -1, '1', min=1, max=60, size=(64, -1))
-        auto = wx.CheckBox(parent, -1, 'Auto-play new items')
+        auto = wx.CheckBox(parent, -1, 'Step through new items')
+        sound = wx.CheckBox(parent, -1, 'Play sound notification')
         grid.Add(duration, (0, 1))
         grid.Add(auto, (0, 4), flag=wx.ALIGN_CENTER_VERTICAL)
+        grid.Add(sound, (0, 6), flag=wx.ALIGN_CENTER_VERTICAL)
         
         sizer.Add(grid, 1, wx.EXPAND|wx.ALL, 8)
         
         duration.Bind(wx.EVT_SPINCTRL, self.on_change)
         auto.Bind(wx.EVT_CHECKBOX, self.on_change)
+        sound.Bind(wx.EVT_CHECKBOX, self.on_change)
         
         self.duration = duration
         self.auto = auto
+        self.sound = sound
         return sizer
     def create_content(self, parent):
         box = wx.StaticBox(parent, -1, 'Content')
@@ -1167,6 +1171,7 @@ class PopupsPanel(wx.Panel):
         self.transparency.SetValue(model.POPUP_TRANSPARENCY)
         self.duration.SetValue(model.POPUP_DURATION)
         self.auto.SetValue(model.POPUP_AUTO_PLAY)
+        self.sound.SetValue(model.PLAY_SOUND)
         self.title.SetValue(model.POPUP_TITLE_LENGTH)
         self.body.SetValue(model.POPUP_BODY_LENGTH)
         util.select_choice(self.theme, model.POPUP_THEME)
@@ -1179,6 +1184,7 @@ class PopupsPanel(wx.Panel):
         model.POPUP_TITLE_LENGTH = self.title.GetValue()
         model.POPUP_BODY_LENGTH = self.body.GetValue()
         model.POPUP_AUTO_PLAY = self.auto.GetValue()
+        model.PLAY_SOUND = self.sound.GetValue()
         model.POPUP_THEME = self.theme.GetClientData(self.theme.GetSelection())
         model.POPUP_POSITION = self.position.GetClientData(self.position.GetSelection())
     def on_change(self, event):

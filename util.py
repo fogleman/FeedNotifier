@@ -107,6 +107,7 @@ def get_proxy():
         return []
         
 def find_themes():
+    return ['default'] # TODO: more themes!
     result = []
     names = os.listdir('themes')
     for name in names:
