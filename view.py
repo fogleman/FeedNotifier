@@ -1366,7 +1366,7 @@ class AboutPanel(wx.Panel):
         * Python 2.6 - http://www.python.org/
         * wxPython 2.8.10 - http://www.wxpython.org/
         * Universal Feed Parser - http://www.feedparser.org/
-        * Jinja 2 - http://jinja.pocoo.org/
+        * PLY 3.3 - http://www.dabeaz.com/ply/
         * py2exe 0.6.9 - http://www.py2exe.org/
         * Inno Setup - http://www.jrsoftware.org/isinfo.php
         
@@ -1385,11 +1385,11 @@ class AboutPanel(wx.Panel):
         THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         
         
-        Jinja 2, a component of this software, requires that the following text be included in the distribution of this application:
-        
-        Copyright (c) 2009 by the Jinja Team, see AUTHORS for more details.
+        PLY 3.3 (Python Lex-Yacc), a component of this software, requires that the following text be included in the distribution of this application:
 
-        Some rights reserved.
+        Copyright (C) 2001-2009,
+        David M. Beazley (Dabeaz LLC)
+        All rights reserved.
         
         Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
         
@@ -1397,7 +1397,7 @@ class AboutPanel(wx.Panel):
         
         * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
         
-        * The names of the contributors may not be used to endorse or promote products derived from this software without specific prior written permission.
+        * Neither the name of the David Beazley or Dabeaz LLC may be used to endorse or promote products derived from this software without specific prior written permission.
         
         THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         ''' % (settings.APP_NAME, settings.APP_VERSION, settings.LOCAL_REVISION)
