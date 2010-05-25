@@ -70,7 +70,7 @@ def get_data_files():
         return result
     data_files = []
     data_files += tree('./icons')
-    data_files += tree('./themes')
+    data_files += tree('./sounds')
     data_files += tree('./Microsoft.VC90.CRT')
     return data_files
     
@@ -80,8 +80,7 @@ setup(
         "compressed": 1,
         "optimize": 1,
         "bundle_files": 1,
-        "skip_scan": ['wx.lib.iewin'],
-        "includes": ['parsetab', 'wx.lib.iewin', 'wx.lib.activex', 'comtypes.gen.SHDocVw'],
+        "includes": ['parsetab'],
     }},
     windows = [{
         "script": "main.py",
