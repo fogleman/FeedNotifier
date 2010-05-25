@@ -3,17 +3,10 @@ import idle
 import feeds
 import popups
 import view
-import socket
 import updater
 import util
 import winsound
 from settings import settings
-
-INVALID_ADDRESSES = [
-    '127.0.0',
-    '169.254',
-    '0.0.0.0',
-]
 
 class Controller(object):
     def __init__(self):
@@ -63,11 +56,6 @@ class Controller(object):
             return
         if not self.manager.should_poll():
             return
-        # make sure we're online
-        address = socket.gethostbyname(socket.gethostname())
-        for invalid in INVALID_ADDRESSES:
-            if address.startswith(invalid):
-                return
         self.polling = True
         self.frame.icon.set_icon('icons/feed_go.png')
         util.start_thread(self._poll_thread)
