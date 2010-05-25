@@ -7,7 +7,7 @@
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
 AppId={{6091F327-2B13-4193-A6F1-4B2271613A74}
 AppName=Feed Notifier
-AppVerName=Feed Notifier 2.2
+AppVerName=Feed Notifier 2.3
 AppPublisher=Michael Fogleman
 AppPublisherURL=http://www.feed-notifier.com/
 AppSupportURL=http://www.feed-notifier.com/
@@ -16,7 +16,7 @@ DefaultDirName={pf}\Feed Notifier
 DefaultGroupName=Feed Notifier
 AllowNoIcons=yes
 OutputDir=installer
-OutputBaseFilename=feed-notifier-2.2
+OutputBaseFilename=feed-notifier-2.3
 Compression=lzma
 SolidCompression=yes
 

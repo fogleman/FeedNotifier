@@ -1,1 +1,1 @@
-installer\feed-notifier-2.2.exe /sp- /silent /norestart
+installer\feed-notifier-2.3.exe /sp- /silent /norestart
