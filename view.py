@@ -1075,8 +1075,8 @@ class PopupsPanel(wx.Panel):
         box = wx.StaticBox(parent, -1, 'Appearance')
         sizer = wx.StaticBoxSizer(box, wx.VERTICAL)
         grid = wx.GridBagSizer(8, 8)
-        labels = ['Theme', 'Width', 'Position', 'Transparency']
-        positions = [(0, 0), (0, 3), (1, 0), (1, 3)]
+        labels = ['Theme', 'Width', 'Position', 'Transparency', 'Monitor']
+        positions = [(0, 0), (0, 3), (1, 0), (1, 3), (2, 0)]
         for label, position in zip(labels, positions):
             text = wx.StaticText(parent, -1, label)
             grid.Add(text, position, flag=wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT)
@@ -1091,8 +1091,12 @@ class PopupsPanel(wx.Panel):
         position.Append('Center', (0, 0))
         width = wx.SpinCtrl(parent, -1, '1', min=1, max=9999, size=(64, -1))
         transparency = wx.SpinCtrl(parent, -1, '0', min=0, max=255, size=(64, -1))
+        display = wx.Choice(parent, -1)
+        for index in range(wx.Display_GetCount()):
+            display.Append('Monitor #%d' % (index + 1), index)
         grid.Add(theme, (0, 1), flag=wx.EXPAND)
         grid.Add(position, (1, 1), flag=wx.EXPAND)
+        grid.Add(display, (2, 1), flag=wx.EXPAND)
         grid.Add(width, (0, 4))
         grid.Add(transparency, (1, 4))
         text = wx.StaticText(parent, -1, 'pixels')
@@ -1103,11 +1107,13 @@ class PopupsPanel(wx.Panel):
         
         theme.Bind(wx.EVT_CHOICE, self.on_change)
         position.Bind(wx.EVT_CHOICE, self.on_change)
+        display.Bind(wx.EVT_CHOICE, self.on_change)
         width.Bind(wx.EVT_SPINCTRL, self.on_change)
         transparency.Bind(wx.EVT_SPINCTRL, self.on_change)
         
         self.theme = theme
         self.position = position
+        self.display = display
         self.width = width
         self.transparency = transparency
         return sizer
@@ -1176,6 +1182,7 @@ class PopupsPanel(wx.Panel):
         self.body.SetValue(model.POPUP_BODY_LENGTH)
         util.select_choice(self.theme, model.POPUP_THEME)
         util.select_choice(self.position, model.POPUP_POSITION)
+        util.select_choice(self.display, model.POPUP_DISPLAY)
     def update_model(self):
         model = self.model
         model.POPUP_WIDTH = self.width.GetValue()
@@ -1187,6 +1194,7 @@ class PopupsPanel(wx.Panel):
         model.PLAY_SOUND = self.sound.GetValue()
         model.POPUP_THEME = self.theme.GetClientData(self.theme.GetSelection())
         model.POPUP_POSITION = self.position.GetClientData(self.position.GetSelection())
+        model.POPUP_DISPLAY = self.display.GetClientData(self.display.GetSelection())
     def on_change(self, event):
         self.dialog.on_change()
         event.Skip()

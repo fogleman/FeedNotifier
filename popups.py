@@ -12,7 +12,11 @@ COMMAND_PLAY = 'http://play/'
 COMMAND_PAUSE = 'http://pause/'
 
 def position_window(window):
-    x, y, w, h = wx.ClientDisplayRect()
+    index = settings.POPUP_DISPLAY
+    if index >= wx.Display_GetCount():
+        index = 0
+    display = wx.Display(index)
+    x, y, w, h = display.GetClientArea()
     cw, ch = window.GetSize()
     pad = 10
     x1 = x + pad
