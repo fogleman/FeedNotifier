@@ -89,12 +89,17 @@ class Frame(wx.Frame):
         panel = wx.Panel(parent, -1)
         panel.SetBackgroundColour(wx.Colour(*BACKGROUND))
         feed = self.item.feed
+        paths = ['icons/feed.png']
         if feed.has_favicon:
-            path = feed.favicon_path
+            paths.insert(0, feed.favicon_path)
+        for path in paths:
+            try:
+                bitmap = util.scale_bitmap(wx.Bitmap(path), 16, 16, wx.Colour(*BACKGROUND))
+                break
+            except Exception:
+                pass
         else:
-            path = 'icons/feed.png'
-        bitmap = wx.Bitmap(path)
-        bitmap = util.scale_bitmap(bitmap, 16, 16, wx.Colour(*BACKGROUND))
+            bitmap = wx.EmptyBitmap(16, 16)
         icon = controls.BitmapLink(panel, feed.link, bitmap)
         icon.SetBackgroundColour(wx.Colour(*BACKGROUND))
         width, height = icon.GetSize()

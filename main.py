@@ -37,6 +37,7 @@ def main():
     if not container:
         return
     app = wx.PySimpleApp()#redirect=True, filename='log.txt')
+    wx.Log_SetActiveTarget(wx.LogStderr())
     ctrl = controller.Controller()
     container.callback = ctrl.parse_args
     container(message)
