@@ -78,7 +78,7 @@ def is_valid_feed(data):
     entries = get(data, 'entries', [])
     title = get(data.feed, 'title', '')
     link = get(data.feed, 'link', '')
-    return entries or (title and link)
+    return entries or title or link
     
 def insert_credentials(url, username, password):
     parts = urlparse.urlsplit(url)
