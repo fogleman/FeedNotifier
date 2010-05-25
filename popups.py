@@ -1,7 +1,5 @@
 import wx
-import wx.lib.iewin as ie
 import webbrowser
-import templates
 from settings import settings
 
 BLANK = 'about:blank'
@@ -41,36 +39,6 @@ class Event(wx.PyEvent):
 EVT_LINK = wx.PyEventBinder(wx.NewEventType())
 EVT_POPUP_CLOSE = wx.PyEventBinder(wx.NewEventType())
 
-class BrowserControl(ie.IEHtmlWindow):
-    def __init__(self, parent):
-        super(BrowserControl, self).__init__(parent, -1)
-    def update_size(self):
-        try:
-            body = self.ctrl.Document.body
-            width = body.scrollWidth
-            height = body.scrollHeight
-            self.SetSize((width, height))
-        except AttributeError:
-            pass
-    def BeforeNavigate2(self, *args):
-        link = args[1][0]
-        event = Event(self, EVT_LINK)
-        event.link = link
-        wx.PostEvent(self, event)
-        return link != BLANK
-        
-class PopupFrame(wx.Frame):
-    def __init__(self):
-        title = settings.APP_NAME
-        style = wx.STAY_ON_TOP | wx.FRAME_NO_TASKBAR | wx.BORDER_NONE
-        super(PopupFrame, self).__init__(None, -1, title, style=style)
-        self.control = BrowserControl(self)
-    def load_src(self, html):
-        control = self.control
-        control.LoadString(html)
-        control.update_size()
-        self.Fit()
-        
 class PopupManager(wx.EvtHandler):
     def __init__(self):
         super(PopupManager, self).__init__()
@@ -136,16 +104,11 @@ class PopupManager(wx.EvtHandler):
             if item != current_item:
                 frame.Hide()
     def create_frame(self, item):
-        if settings.POPUP_THEME == 'default':
+        if True:#settings.POPUP_THEME == 'default':
             import theme_default
             context = self.create_context(item)
             frame = theme_default.Frame(item, context)
             frame.Bind(EVT_LINK, self.on_link)
-        else:
-            html = self.render_item(item)
-            frame = PopupFrame()
-            frame.control.Bind(EVT_LINK, self.on_link)
-            frame.load_src(html)
         position_window(frame)
         if settings.POPUP_TRANSPARENCY < 255:
             frame.SetTransparent(0)
@@ -168,10 +131,6 @@ class PopupManager(wx.EvtHandler):
         context['COMMAND_PLAY'] = COMMAND_PLAY
         context['COMMAND_PAUSE'] = COMMAND_PAUSE
         return context
-    def render_item(self, item):
-        context = self.create_context(item)
-        html = templates.render(settings.POPUP_THEME, item, context)
-        return html
     def set_timer(self):
         if self.timer and self.timer.IsRunning():
             return

@@ -15,6 +15,8 @@ class Frame(wx.Frame):
         self.context = context
         container = self.create_container(self)
         container.Bind(wx.EVT_MOUSEWHEEL, self.on_mousewheel)
+        container.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
+        self.container = container
         self.Fit()
     def post_link(self, link):
         event = popups.Event(self, popups.EVT_LINK)
@@ -29,14 +31,31 @@ class Frame(wx.Frame):
             self.post_link(popups.COMMAND_NEXT)
         else:
             self.post_link(popups.COMMAND_PREVIOUS)
+    def on_focus(self, event):
+        if event.GetEventObject() != self.container:
+            self.container.SetFocusIgnoringChildren()
+    def on_key_down(self, event):
+        code = event.GetKeyCode()
+        if code == wx.WXK_ESCAPE:
+            self.post_link(popups.COMMAND_CLOSE)
+        elif code == wx.WXK_LEFT:
+            self.post_link(popups.COMMAND_PREVIOUS)
+        elif code == wx.WXK_RIGHT:
+            self.post_link(popups.COMMAND_NEXT)
+        elif code == wx.WXK_HOME:
+            self.post_link(popups.COMMAND_FIRST)
+        elif code == wx.WXK_END:
+            self.post_link(popups.COMMAND_LAST)
     def bind_links(self, widgets):
         for widget in widgets:
             widget.Bind(controls.EVT_HYPERLINK, self.on_link)
+            widget.Bind(wx.EVT_SET_FOCUS, self.on_focus)
     def bind_widgets(self, widgets):
         for widget in widgets:
             widget.Bind(wx.EVT_LEFT_DOWN, self.on_left_down)
+            widget.Bind(wx.EVT_SET_FOCUS, self.on_focus)
     def create_container(self, parent):
-        panel1 = wx.Panel(parent, -1)
+        panel1 = wx.Panel(parent, -1, style=wx.WANTS_CHARS)
         panel1.SetBackgroundColour(wx.BLACK)
         panel2 = wx.Panel(panel1, -1)
         panel2.SetBackgroundColour(wx.WHITE)
