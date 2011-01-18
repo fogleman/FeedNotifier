@@ -1,4 +1,4 @@
-import util
+import safe_pickle
 
 class InvalidSettingError(Exception):
     pass
@@ -52,11 +52,11 @@ class FileSettings(Settings):
         self.load()
     def load(self):
         try:
-            self._settings = util.safe_load(self._file)
+            self._settings = safe_pickle.load(self._file)
         except Exception:
             self._settings = {}
     def save(self):
-        util.safe_save(self._file, self._settings)
+        safe_pickle.save(self._file, self._settings)
     def get(self, name):
         if name in self._settings:
             return self._settings[name]

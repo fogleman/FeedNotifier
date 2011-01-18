@@ -9,6 +9,7 @@ import filters
 import util
 import Queue
 import logging
+import safe_pickle
 from settings import settings
 
 def cmp_timestamp(a, b):
@@ -236,7 +237,7 @@ class FeedManager(object):
     def load(self, path='feeds.dat'):
         logging.info('Loading feed data from "%s"' % path)
         try:
-            data = util.safe_load(path)
+            data = safe_pickle.load(path)
         except Exception:
             data = ([], [], [])
         # backward compatibility
@@ -259,7 +260,7 @@ class FeedManager(object):
     def save(self, path='feeds.dat'):
         logging.info('Saving feed data to "%s"' % path)
         data = (self.feeds, self.items, self.filters)
-        util.safe_save(path, data)
+        safe_pickle.save(path, data)
     def clear_item_history(self):
         logging.info('Clearing item history')
         del self.items[:]
