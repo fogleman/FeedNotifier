@@ -9,7 +9,6 @@ import filters
 import util
 import Queue
 import logging
-import cPickle as pickle
 from settings import settings
 
 def cmp_timestamp(a, b):
@@ -237,8 +236,7 @@ class FeedManager(object):
     def load(self, path='feeds.dat'):
         logging.info('Loading feed data from "%s"' % path)
         try:
-            with open(path, 'rb') as input:
-                data = pickle.load(input)
+            data = util.safe_load(path)
         except Exception:
             data = ([], [], [])
         # backward compatibility
@@ -260,9 +258,8 @@ class FeedManager(object):
         logging.info('Loaded %d feeds, %d items, %d filters' % (len(self.feeds), len(self.items), len(self.filters)))
     def save(self, path='feeds.dat'):
         logging.info('Saving feed data to "%s"' % path)
-        with open(path, 'wb') as output:
-            data = (self.feeds, self.items, self.filters)
-            pickle.dump(data, output, -1)
+        data = (self.feeds, self.items, self.filters)
+        util.safe_save(path, data)
     def clear_item_history(self):
         logging.info('Clearing item history')
         del self.items[:]

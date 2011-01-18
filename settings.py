@@ -1,4 +1,4 @@
-import cPickle as pickle
+import util
 
 class InvalidSettingError(Exception):
     pass
@@ -52,15 +52,11 @@ class FileSettings(Settings):
         self.load()
     def load(self):
         try:
-            input = open(self._file, 'rb')
-            self._settings = pickle.load(input)
-            input.close()
+            self._settings = util.safe_load(self._file)
         except Exception:
             self._settings = {}
     def save(self):
-        output = open(self._file, 'wb')
-        pickle.dump(self._settings, output, -1)
-        output.close()
+        util.safe_save(self._file, self._settings)
     def get(self, name):
         if name in self._settings:
             return self._settings[name]

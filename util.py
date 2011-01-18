@@ -8,9 +8,31 @@ import urllib2
 import urlparse
 import threading
 import feedparser
+import cPickle as pickle
 from htmlentitydefs import name2codepoint
 from settings import settings
 
+def safe_load(path):
+    tmp_path = '%s.tmp' % path
+    bak_path = '%s.bak' % path
+    for p in (path, bak_path, tmp_path):
+        try:
+            with open(p, 'rb') as file:
+                return pickle.load(file)
+        except Exception:
+            pass
+    raise Exception
+    
+def safe_save(path, data):
+    tmp_path = '%s.tmp' % path
+    bak_path = '%s.bak' % path
+    with open(tmp_path, 'wb') as file:
+        pickle.dump(data, file, -1)
+    os.remove(bak_path)
+    os.rename(path, bak_path)
+    os.rename(tmp_path, path)
+    os.remove(bak_path)
+    
 def start_thread(func, *args):
     thread = threading.Thread(target=func, args=args)
     thread.setDaemon(True)
