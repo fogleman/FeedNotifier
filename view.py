@@ -65,7 +65,7 @@ class HiddenFrame(wx.Frame):
     def on_close(self, event):
         event.Skip()
         wx.CallAfter(self.icon.Destroy)
-        self.controller.save()
+        #self.controller.save()
         
 class AddFeedDialog(wx.Dialog):
     @staticmethod
