@@ -11,6 +11,15 @@ import feedparser
 from htmlentitydefs import name2codepoint
 from settings import settings
 
+def set_icon(window):
+    bundle = wx.IconBundle()
+    bundle.AddIcon(wx.Icon('icons/16.png', wx.BITMAP_TYPE_PNG))
+    bundle.AddIcon(wx.Icon('icons/24.png', wx.BITMAP_TYPE_PNG))
+    bundle.AddIcon(wx.Icon('icons/32.png', wx.BITMAP_TYPE_PNG))
+    bundle.AddIcon(wx.Icon('icons/48.png', wx.BITMAP_TYPE_PNG))
+    bundle.AddIcon(wx.Icon('icons/256.png', wx.BITMAP_TYPE_PNG))
+    window.SetIcons(bundle)
+    
 def start_thread(func, *args):
     thread = threading.Thread(target=func, args=args)
     thread.setDaemon(True)

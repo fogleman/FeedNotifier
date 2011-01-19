@@ -12,6 +12,7 @@ class CancelException(Exception):
 class DownloadDialog(wx.Dialog):
     def __init__(self, parent):
         super(DownloadDialog, self).__init__(parent, -1, 'Feed Notifier Update')
+        util.set_icon(self)
         self.path = None
         text = wx.StaticText(self, -1, 'Downloading update, please wait...')
         self.gauge = wx.Gauge(self, -1, 100, size=(250, 16))

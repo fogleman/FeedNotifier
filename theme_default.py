@@ -11,6 +11,7 @@ class Frame(wx.Frame):
         title = settings.APP_NAME
         style = wx.STAY_ON_TOP | wx.FRAME_NO_TASKBAR | wx.BORDER_NONE
         super(Frame, self).__init__(None, -1, title, style=style)
+        util.set_icon(self)
         self.item = item
         self.context = context
         container = self.create_container(self)

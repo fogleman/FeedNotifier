@@ -85,6 +85,7 @@ class AddFeedDialog(wx.Dialog):
             return None
     def __init__(self, parent, initial_url=''):
         super(AddFeedDialog, self).__init__(parent, -1, 'Add RSS/Atom Feed')
+        util.set_icon(self)
         #self.SetIcon(wx.IconFromBitmap(wx.Bitmap('icons/feed.png')))
         self.initial_url = initial_url
         self.result = None
@@ -209,6 +210,7 @@ class AddFeedDialog(wx.Dialog):
 class PasswordDialog(wx.Dialog):
     def __init__(self, parent, username=None, password=None):
         super(PasswordDialog, self).__init__(parent, -1, 'Password Required')
+        util.set_icon(self)
         panel = self.create_panel(self)
         if username:
             self.username.SetValue(username)
@@ -266,6 +268,7 @@ class EditFeedDialog(wx.Dialog):
     def __init__(self, parent, feed, add=False):
         title = 'Add RSS/Atom Feed' if add else 'Edit RSS/Atom Feed'
         super(EditFeedDialog, self).__init__(parent, -1, title)
+        util.set_icon(self)
         #self.SetIcon(wx.IconFromBitmap(wx.Bitmap('icons/feed.png')))
         self.feed = feed
         self.add = add
@@ -393,6 +396,7 @@ class EditFilterDialog(wx.Dialog):
         title = 'Edit Filter' if filter else 'Add Filter'
         style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
         super(EditFilterDialog, self).__init__(parent, -1, title, style=style)
+        util.set_icon(self)
         self.model = model
         self.filter = filter or feeds.Filter('')
         panel = self.create_panel(self)
@@ -646,6 +650,7 @@ class SettingsDialog(wx.Dialog):
         title = '%s Preferences' % settings.APP_NAME
         style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
         super(SettingsDialog, self).__init__(parent, -1, title, style=style)
+        util.set_icon(self)
         #self.SetIcon(wx.IconFromBitmap(wx.Bitmap('icons/feed.png')))
         self.model = Model(controller)
         panel = self.create_panel(self)
