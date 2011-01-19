@@ -7,11 +7,11 @@
 	</MASTER_PAD_VERSION_INFO>
 	<Company_Info>
 		<Company_Name>Michael Fogleman</Company_Name>
-		<Address_1>221 Orchard Park Drive</Address_1>
+		<Address_1>404 Gravel Brook Court</Address_1>
 		<Address_2 />
 		<City_Town>Cary</City_Town>
 		<State_Province>NC</State_Province>
-		<Zip_Postal_Code>27513</Zip_Postal_Code>
+		<Zip_Postal_Code>27519</Zip_Postal_Code>
 		<Country>US</Country>
 		<Company_WebSite_URL>http://www.michaelfogleman.com/</Company_WebSite_URL>
 		<Contact_Info>
@@ -35,9 +35,9 @@
 	<Program_Info>
 		<Program_Name>Feed Notifier</Program_Name>
 		<Program_Version>2.4</Program_Version>
-		<Program_Release_Month>05</Program_Release_Month>
-		<Program_Release_Day>26</Program_Release_Day>
-		<Program_Release_Year>2010</Program_Release_Year>
+		<Program_Release_Month>01</Program_Release_Month>
+		<Program_Release_Day>18</Program_Release_Day>
+		<Program_Release_Year>2011</Program_Release_Year>
 		<Program_Cost_Dollars />
 		<Program_Cost_Other_Code />
 		<Program_Cost_Other />
@@ -51,9 +51,9 @@
 		<Program_Category_Class>Network &amp; Internet::Other</Program_Category_Class>
 		<Program_System_Requirements />
 		<File_Info>
-			<File_Size_Bytes>7276404</File_Size_Bytes>
-			<File_Size_K>7105</File_Size_K>
-			<File_Size_MB>6.94</File_Size_MB>
+			<File_Size_Bytes>7044473</File_Size_Bytes>
+			<File_Size_K>6879</File_Size_K>
+			<File_Size_MB>6.71</File_Size_MB>
 		</File_Info>
 		<Expire_Info>
 			<Has_Expire_Info>N</Has_Expire_Info>
