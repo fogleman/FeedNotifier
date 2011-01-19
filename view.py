@@ -55,18 +55,6 @@ class TaskBarIcon(wx.TaskBarIcon):
     def on_settings(self, event):
         self.controller.edit_settings()
         
-class HiddenFrame(wx.Frame):
-    def __init__(self, controller):
-        super(HiddenFrame, self).__init__(None, -1, settings.APP_NAME)
-        self.controller = controller
-        self.icon = TaskBarIcon(controller)
-        self.Bind(wx.EVT_CLOSE, self.on_close)
-        self.CenterOnScreen()
-    def on_close(self, event):
-        event.Skip()
-        wx.CallAfter(self.icon.Destroy)
-        #self.controller.save()
-        
 class AddFeedDialog(wx.Dialog):
     @staticmethod
     def show_wizard(parent, url=''):

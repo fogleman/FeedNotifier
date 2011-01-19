@@ -10,7 +10,7 @@ from settings import settings
 
 class Controller(object):
     def __init__(self):
-        self.frame = view.HiddenFrame(self)
+        self.icon = view.TaskBarIcon(self)
         self.manager = feeds.FeedManager()
         self.manager.load()
         self.add_default_feeds()
@@ -34,11 +34,11 @@ class Controller(object):
                 continue
             self.add_feed(url)
     def enable(self):
-        self.frame.icon.set_icon('icons/feed.png')
+        self.icon.set_icon('icons/feed.png')
         self.enabled = True
         self.poll()
     def disable(self):
-        self.frame.icon.set_icon('icons/feed_disabled.png')
+        self.icon.set_icon('icons/feed_disabled.png')
         self.enabled = False
     def save(self):
         self.manager.save()
@@ -57,7 +57,7 @@ class Controller(object):
         if not self.manager.should_poll():
             return
         self.polling = True
-        self.frame.icon.set_icon('icons/feed_go.png')
+        self.icon.set_icon('icons/feed_go.png')
         util.start_thread(self._poll_thread)
     def _poll_thread(self):
         found_new = False
@@ -79,7 +79,7 @@ class Controller(object):
         if found_new:
             self.save()
         self.polling = False
-        self.frame.icon.set_icon('icons/feed.png')
+        self.icon.set_icon('icons/feed.png')
     def force_poll(self):
         for feed in self.manager.feeds:
             feed.last_poll = 0
@@ -111,14 +111,14 @@ class Controller(object):
         index = len(items) - 1
         self.show_items(items, index, True)
     def add_feed(self, url=''):
-        feed = view.AddFeedDialog.show_wizard(self.frame, url)
+        feed = view.AddFeedDialog.show_wizard(None, url)
         if not feed:
             return
         self.manager.add_feed(feed)
         self.save()
         self.poll()
     def edit_settings(self):
-        window = view.SettingsDialog(self.frame, self)
+        window = view.SettingsDialog(None, self)
         window.Center()
         window.ShowModal()
         window.Destroy()
@@ -128,9 +128,9 @@ class Controller(object):
         try:
             if self.popup:
                 self.popup.on_close()
-            self.frame.Close()
+            wx.CallAfter(self.icon.Destroy)
         finally:
-            wx.GetApp().ExitMainLoop()
+            pass #wx.GetApp().ExitMainLoop()
     def on_popup_close(self, event):
         self.popup = None
         self.manager.purge_items(settings.ITEM_CACHE_AGE)

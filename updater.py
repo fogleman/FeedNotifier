@@ -94,18 +94,18 @@ def do_check(controller, force=False):
         wx.CallAfter(do_tell, controller)
         
 def do_ask(controller):
-    dialog = wx.MessageDialog(controller.frame, 'Feed Notifier software updates are available.  Download and install now?', 'Update Feed Notifier?', wx.YES_NO|wx.YES_DEFAULT|wx.ICON_QUESTION)
+    dialog = wx.MessageDialog(None, 'Feed Notifier software updates are available.  Download and install now?', 'Update Feed Notifier?', wx.YES_NO|wx.YES_DEFAULT|wx.ICON_QUESTION)
     if dialog.ShowModal() == wx.ID_YES:
         do_download(controller)
     dialog.Destroy()
     
 def do_tell(controller):
-    dialog = wx.MessageDialog(controller.frame, 'No software updates are available at this time.', 'No Updates', wx.OK|wx.ICON_INFORMATION)
+    dialog = wx.MessageDialog(None, 'No software updates are available at this time.', 'No Updates', wx.OK|wx.ICON_INFORMATION)
     dialog.ShowModal()
     dialog.Destroy()
     
 def do_download(controller):
-    dialog = DownloadDialog(controller.frame)
+    dialog = DownloadDialog(None)
     dialog.Center()
     result = dialog.ShowModal()
     path = dialog.path
