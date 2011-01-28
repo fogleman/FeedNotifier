@@ -1,6 +1,5 @@
 import wx
 import wx.lib.wordwrap as wordwrap
-import util
 
 class Event(wx.PyEvent):
     def __init__(self, event_object, type):
@@ -47,10 +46,11 @@ class Text(wx.PyPanel):
         dc.Clear()
         self.draw_lines(dc)
     def setup_dc(self, dc):
+        parent = self.GetParent()
         dc.SetFont(self.GetFont())
-        dc.SetTextBackground(self.GetBackgroundColour())
-        dc.SetTextForeground(self.GetForegroundColour())
-        dc.SetBackground(wx.Brush(self.GetBackgroundColour()))
+        dc.SetTextBackground(parent.GetBackgroundColour())
+        dc.SetTextForeground(parent.GetForegroundColour())
+        dc.SetBackground(wx.Brush(parent.GetBackgroundColour()))
     def draw_lines(self, dc, emulate=False):
         if self.wrap:
             text = wordwrap.wordwrap(self.text.strip(), self.width, dc)
@@ -151,8 +151,9 @@ class BitmapLink(wx.PyPanel):
         self.Bind(wx.EVT_LEFT_DOWN, self.on_left_down)
         self.Bind(wx.EVT_LEFT_UP, self.on_left_up)
     def on_paint(self, event):
+        parent = self.GetParent()
         dc = wx.AutoBufferedPaintDC(self)
-        dc.SetBackground(wx.Brush(self.GetBackgroundColour()))
+        dc.SetBackground(wx.Brush(parent.GetBackgroundColour()))
         dc.Clear()
         bitmap = self.hover_bitmap if self.hover else self.bitmap
         dc.DrawBitmap(bitmap, 0, 0, True)

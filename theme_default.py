@@ -13,6 +13,7 @@ class Frame(wx.Frame):
         super(Frame, self).__init__(None, -1, title, style=style)
         self.item = item
         self.context = context
+        self.hover_count = 0
         container = self.create_container(self)
         container.Bind(wx.EVT_MOUSEWHEEL, self.on_mousewheel)
         container.Bind(wx.EVT_KEY_DOWN, self.on_key_down)
@@ -46,19 +47,35 @@ class Frame(wx.Frame):
             self.post_link(popups.COMMAND_FIRST)
         elif code == wx.WXK_END:
             self.post_link(popups.COMMAND_LAST)
+    def on_enter(self, event):
+        event.Skip()
+        self.hover_count += 1
+        if self.hover_count == 1:
+            wx.PostEvent(self, popups.Event(self, popups.EVT_POPUP_ENTER))
+    def on_leave(self, event):
+        event.Skip()
+        self.hover_count -= 1
+        if self.hover_count == 0:
+            wx.PostEvent(self, popups.Event(self, popups.EVT_POPUP_LEAVE))
     def bind_links(self, widgets):
         for widget in widgets:
             widget.Bind(controls.EVT_HYPERLINK, self.on_link)
             widget.Bind(wx.EVT_SET_FOCUS, self.on_focus)
+            widget.Bind(wx.EVT_ENTER_WINDOW, self.on_enter)
+            widget.Bind(wx.EVT_LEAVE_WINDOW, self.on_leave)
     def bind_widgets(self, widgets):
         for widget in widgets:
             widget.Bind(wx.EVT_LEFT_DOWN, self.on_left_down)
             widget.Bind(wx.EVT_SET_FOCUS, self.on_focus)
+            widget.Bind(wx.EVT_ENTER_WINDOW, self.on_enter)
+            widget.Bind(wx.EVT_LEAVE_WINDOW, self.on_leave)
     def create_container(self, parent):
         panel1 = wx.Panel(parent, -1, style=wx.WANTS_CHARS)
         panel1.SetBackgroundColour(wx.BLACK)
+        panel1.SetForegroundColour(wx.BLACK)
         panel2 = wx.Panel(panel1, -1)
         panel2.SetBackgroundColour(wx.WHITE)
+        panel2.SetForegroundColour(wx.BLACK)
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(panel2, 1, wx.EXPAND|wx.ALL, 3)
         panel1.SetSizer(sizer)
@@ -88,6 +105,7 @@ class Frame(wx.Frame):
     def create_header(self, parent):
         panel = wx.Panel(parent, -1)
         panel.SetBackgroundColour(wx.Colour(*BACKGROUND))
+        panel.SetForegroundColour(wx.BLACK)
         feed = self.item.feed
         paths = ['icons/feed.png']
         if feed.has_favicon:
@@ -164,6 +182,7 @@ class Frame(wx.Frame):
     def create_footer(self, parent):
         panel = wx.Panel(parent, -1)
         panel.SetBackgroundColour(wx.Colour(*BACKGROUND))
+        panel.SetForegroundColour(wx.BLACK)
         first = controls.BitmapLink(panel, popups.COMMAND_FIRST, wx.Bitmap('icons/control_start.png'), wx.Bitmap('icons/control_start_blue.png'))
         previous = controls.BitmapLink(panel, popups.COMMAND_PREVIOUS, wx.Bitmap('icons/control_rewind.png'), wx.Bitmap('icons/control_rewind_blue.png'))
         text = '%s of %s' % (self.context['item_index'], self.context['item_count'])
@@ -195,7 +214,7 @@ class Frame(wx.Frame):
         sizer.Add(pause, 0, wx.TOP|wx.BOTTOM, 5)
         sizer.AddSpacer(10)
         panel.SetSizer(sizer)
-        self.bind_widgets([panel])
+        self.bind_widgets([panel, text])
         return panel
         
 if __name__ == '__main__':

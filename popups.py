@@ -42,6 +42,8 @@ class Event(wx.PyEvent):
         
 EVT_LINK = wx.PyEventBinder(wx.NewEventType())
 EVT_POPUP_CLOSE = wx.PyEventBinder(wx.NewEventType())
+EVT_POPUP_ENTER = wx.PyEventBinder(wx.NewEventType())
+EVT_POPUP_LEAVE = wx.PyEventBinder(wx.NewEventType())
 
 class PopupManager(wx.EvtHandler):
     def __init__(self):
@@ -49,6 +51,7 @@ class PopupManager(wx.EvtHandler):
         self.timer = None
         self.auto = settings.POPUP_AUTO_PLAY
         self.cache = {}
+        self.hover_count = 0
     def set_items(self, items, index=0, focus=False):
         self.items = list(items)
         self.index = index
@@ -113,6 +116,8 @@ class PopupManager(wx.EvtHandler):
             context = self.create_context(item)
             frame = theme_default.Frame(item, context)
             frame.Bind(EVT_LINK, self.on_link)
+            frame.Bind(EVT_POPUP_ENTER, self.on_enter)
+            frame.Bind(EVT_POPUP_LEAVE, self.on_leave)
         position_window(frame)
         if settings.POPUP_TRANSPARENCY < 255:
             frame.SetTransparent(0)
@@ -144,6 +149,12 @@ class PopupManager(wx.EvtHandler):
         if self.timer and self.timer.IsRunning():
             self.timer.Stop()
             self.timer = None
+    def on_enter(self, event):
+        event.Skip()
+        self.hover_count += 1
+    def on_leave(self, event):
+        event.Skip()
+        self.hover_count -= 1
     def on_link(self, event):
         link = event.link
         # track the click
@@ -200,11 +211,15 @@ class PopupManager(wx.EvtHandler):
         wx.PostEvent(self, event)
     def on_timer(self):
         self.timer = None
-        if not self.auto:
-            return
-        if self.index == self.count - 1:
-            self.on_close()
-        else:
-            self.on_next(False)
+        set_timer = False
+        if self.hover_count:
+            set_timer = True
+        elif self.auto:
+            if self.index == self.count - 1:
+                self.on_close()
+            else:
+                self.on_next(False)
+                set_timer = True
+        if set_timer:
             self.set_timer()
             

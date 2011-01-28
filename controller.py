@@ -18,7 +18,7 @@ class Controller(object):
         self.polling = False
         self.enabled = True
         self.on_poll()
-        self.check_for_updates(False)
+        self.on_check_for_updates()
     def add_default_feeds(self):
         if self.manager.feeds:
             return
@@ -42,11 +42,18 @@ class Controller(object):
         self.enabled = False
     def save(self):
         self.manager.save()
+    def on_check_for_updates(self):
+        try:
+            self.check_for_updates(False)
+        finally:
+            wx.CallLater(1000 * 60 * 5, self.on_check_for_updates)
+    def check_for_updates(self, force=True):
+        updater.run(self, force)
     def on_poll(self):
         try:
             self.poll()
         finally:
-            wx.CallLater(5000, self.on_poll)
+            wx.CallLater(1000 * 5, self.on_poll)
     def poll(self):
         if self.polling:
             return
@@ -122,8 +129,6 @@ class Controller(object):
         window.Center()
         window.ShowModal()
         window.Destroy()
-    def check_for_updates(self, force=True):
-        updater.run(self, force)
     def close(self):
         try:
             if self.popup:
