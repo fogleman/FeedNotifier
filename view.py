@@ -1292,7 +1292,7 @@ class OptionsPanel(wx.Panel):
         grid.Add(use_proxy, (0, 0), flag=wx.ALIGN_CENTER_VERTICAL)
         proxy_url = wx.TextCtrl(parent, -1)
         grid.Add(proxy_url, (1, 0), flag=wx.EXPAND)
-        text = wx.StaticText(parent, -1, 'Format: http://<username>:<password>@<proxyserver>:<proxyport>')
+        text = wx.StaticText(parent, -1, 'Format: http://<username>:<password>@<proxyserver>:<proxyport>\nLeave blank to use Windows proxy settings.')
         grid.Add(text, (2, 0), flag=wx.ALIGN_CENTER_VERTICAL)
         
         sizer.Add(grid, 1, wx.EXPAND|wx.ALL, 8)
