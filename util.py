@@ -108,17 +108,20 @@ def decode_password(password):
 def get_proxy():
     if settings.USE_PROXY:
         if settings.PROXY_URL:
+            # User-configured Proxy
             map = {
                 'http': settings.PROXY_URL,
                 'https': settings.PROXY_URL,
             }
+            proxy = urllib2.ProxyHandler(map)
         else:
-            map = {} # fallback on OS defaults
-        proxy = urllib2.ProxyHandler(map)
-        return [proxy]
+            # Windows-configured Proxy
+            proxy = urllib2.ProxyHandler()
     else:
-        return []
-        
+        # No Proxy
+        proxy = urllib2.ProxyHandler({})
+    return [proxy]
+    
 def find_themes():
     return ['default'] # TODO: more themes!
     result = []
