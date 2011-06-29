@@ -84,7 +84,8 @@ class Feed(object):
             pass
         # try to download the favicon
         try:
-            f = urllib2.urlopen(self.favicon_url)
+            opener = urllib2.build_opener(util.get_proxy())
+            f = opener.open(self.favicon_url)
             data = f.read()
             f.close()
             f = open(self.favicon_path, 'wb')

@@ -78,7 +78,7 @@ def abspath(path):
     
 def parse(url, username=None, password=None, etag=None, modified=None):
     agent = settings.USER_AGENT
-    handlers = get_proxy()
+    handlers = [get_proxy()]
     if username and password:
         url = insert_credentials(url, username, password)
     return feedparser.parse(url, etag=etag, modified=modified, agent=agent, handlers=handlers)
@@ -120,7 +120,7 @@ def get_proxy():
     else:
         # No Proxy
         proxy = urllib2.ProxyHandler({})
-    return [proxy]
+    return proxy
     
 def find_themes():
     return ['default'] # TODO: more themes!
