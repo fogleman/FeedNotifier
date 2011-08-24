@@ -31,6 +31,7 @@ FEED_CACHE_SIZE = 500
 MAX_WORKER_THREADS = 10
 PLAY_SOUND = True
 SOUND_PATH = 'sounds/notification.wav'
+SOCKET_TIMEOUT = 15
 
 # Initial Setup
 DEFAULT_FEED_URLS = [

@@ -6,10 +6,12 @@ import view
 import updater
 import util
 import winsound
+import socket
 from settings import settings
 
 class Controller(object):
     def __init__(self):
+        socket.setdefaulttimeout(settings.SOCKET_TIMEOUT)
         self.icon = view.TaskBarIcon(self)
         self.manager = feeds.FeedManager()
         self.manager.load()
