@@ -1121,11 +1121,13 @@ class PopupsPanel(wx.Panel):
         grid.Add(text, (0, 2), flag=wx.ALIGN_CENTER_VERTICAL)
         
         duration = wx.SpinCtrl(parent, -1, '1', min=1, max=60, size=(64, -1))
-        auto = wx.CheckBox(parent, -1, 'Step through new items')
-        sound = wx.CheckBox(parent, -1, 'Play sound notification')
+        auto = wx.CheckBox(parent, -1, 'Infinite duration')
+        sound = wx.CheckBox(parent, -1, 'Sound notification')
+        hover = wx.CheckBox(parent, -1, 'Wait if hovering')
         grid.Add(duration, (0, 1))
         grid.Add(auto, (0, 4), flag=wx.ALIGN_CENTER_VERTICAL)
-        grid.Add(sound, (0, 6), flag=wx.ALIGN_CENTER_VERTICAL)
+        grid.Add(sound, (1, 4), flag=wx.ALIGN_CENTER_VERTICAL)
+        grid.Add(hover, (0, 6), flag=wx.ALIGN_CENTER_VERTICAL)
         
         sizer.Add(grid, 1, wx.EXPAND|wx.ALL, 8)
         
@@ -1136,6 +1138,7 @@ class PopupsPanel(wx.Panel):
         self.duration = duration
         self.auto = auto
         self.sound = sound
+        self.hover = hover
         return sizer
     def create_content(self, parent):
         box = wx.StaticBox(parent, -1, 'Content')
@@ -1169,8 +1172,9 @@ class PopupsPanel(wx.Panel):
         self.width.SetValue(model.POPUP_WIDTH)
         self.transparency.SetValue(model.POPUP_TRANSPARENCY)
         self.duration.SetValue(model.POPUP_DURATION)
-        self.auto.SetValue(model.POPUP_AUTO_PLAY)
+        self.auto.SetValue(not model.POPUP_AUTO_PLAY)
         self.sound.SetValue(model.PLAY_SOUND)
+        self.hover.SetValue(model.POPUP_WAIT_ON_HOVER)
         self.title.SetValue(model.POPUP_TITLE_LENGTH)
         self.body.SetValue(model.POPUP_BODY_LENGTH)
         util.select_choice(self.theme, model.POPUP_THEME)
@@ -1183,7 +1187,8 @@ class PopupsPanel(wx.Panel):
         model.POPUP_DURATION = self.duration.GetValue()
         model.POPUP_TITLE_LENGTH = self.title.GetValue()
         model.POPUP_BODY_LENGTH = self.body.GetValue()
-        model.POPUP_AUTO_PLAY = self.auto.GetValue()
+        model.POPUP_AUTO_PLAY = not self.auto.GetValue()
+        model.POPUP_WAIT_ON_HOVER = self.hover.GetValue()
         model.PLAY_SOUND = self.sound.GetValue()
         model.POPUP_THEME = self.theme.GetClientData(self.theme.GetSelection())
         model.POPUP_POSITION = self.position.GetClientData(self.position.GetSelection())
@@ -1252,36 +1257,36 @@ class OptionsPanel(wx.Panel):
         sizer = wx.StaticBoxSizer(box, wx.VERTICAL)
         grid = wx.GridBagSizer(8, 8)
         
-        text = wx.StaticText(parent, -1, 'Item History')
+        text = wx.StaticText(parent, -1, 'Pop-up History')
         grid.Add(text, (0, 0), flag=wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT)
-        text = wx.StaticText(parent, -1, 'Feed Cache')
-        grid.Add(text, (1, 0), flag=wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT)
+        #text = wx.StaticText(parent, -1, 'Item Cache')
+        #grid.Add(text, (1, 0), flag=wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT)
         text = wx.StaticText(parent, -1, 'days')
         grid.Add(text, (0, 2), flag=wx.ALIGN_CENTER_VERTICAL)
-        text = wx.StaticText(parent, -1, 'items per feed')
-        grid.Add(text, (1, 2), flag=wx.ALIGN_CENTER_VERTICAL)
+        #text = wx.StaticText(parent, -1, 'items per feed')
+        #grid.Add(text, (1, 2), flag=wx.ALIGN_CENTER_VERTICAL)
         
         item = wx.SpinCtrl(parent, -1, '1', min=1, max=365, size=(64, -1))
         grid.Add(item, (0, 1))
-        feed = wx.SpinCtrl(parent, -1, '1', min=1, max=9999, size=(64, -1))
-        grid.Add(feed, (1, 1))
+        #feed = wx.SpinCtrl(parent, -1, '1', min=1, max=9999, size=(64, -1))
+        #grid.Add(feed, (1, 1))
         
         clear_item = wx.Button(parent, -1, 'Clear')
         grid.Add(clear_item, (0, 3))
-        clear_feed = wx.Button(parent, -1, 'Clear')
-        grid.Add(clear_feed, (1, 3))
+        #clear_feed = wx.Button(parent, -1, 'Clear')
+        #grid.Add(clear_feed, (1, 3))
         
         sizer.Add(grid, 1, wx.EXPAND|wx.ALL, 8)
         
         item.Bind(wx.EVT_SPINCTRL, self.on_change)
-        feed.Bind(wx.EVT_SPINCTRL, self.on_change)
+        #feed.Bind(wx.EVT_SPINCTRL, self.on_change)
         clear_item.Bind(wx.EVT_BUTTON, self.on_clear_item)
-        clear_feed.Bind(wx.EVT_BUTTON, self.on_clear_feed)
+        #clear_feed.Bind(wx.EVT_BUTTON, self.on_clear_feed)
         
         self.item = item
-        self.feed = feed
+        #self.feed = feed
         self.clear_item = clear_item
-        self.clear_feed = clear_feed
+        #self.clear_feed = clear_feed
         return sizer
     def create_proxy(self, parent):
         box = wx.StaticBox(parent, -1, 'Proxy')
@@ -1290,7 +1295,7 @@ class OptionsPanel(wx.Panel):
         
         use_proxy = wx.CheckBox(parent, -1, 'Use a proxy server')
         grid.Add(use_proxy, (0, 0), flag=wx.ALIGN_CENTER_VERTICAL)
-        proxy_url = wx.TextCtrl(parent, -1)
+        proxy_url = wx.TextCtrl(parent, -1, style=wx.TE_PASSWORD)
         grid.Add(proxy_url, (1, 0), flag=wx.EXPAND)
         text = wx.StaticText(parent, -1, 'Format: http://<username>:<password>@<proxyserver>:<proxyport>\nLeave blank to use Windows proxy settings.')
         grid.Add(text, (2, 0), flag=wx.ALIGN_CENTER_VERTICAL)
@@ -1310,7 +1315,6 @@ class OptionsPanel(wx.Panel):
         self.auto_update.SetValue(model.CHECK_FOR_UPDATES)
         one_day = 60 * 60 * 24
         self.item.SetValue(model.ITEM_CACHE_AGE / one_day)
-        self.feed.SetValue(model.FEED_CACHE_SIZE)
         self.use_proxy.SetValue(model.USE_PROXY)
         self.proxy_url.ChangeValue(model.PROXY_URL)
         self.enable_controls()
@@ -1321,7 +1325,6 @@ class OptionsPanel(wx.Panel):
         model.CHECK_FOR_UPDATES = self.auto_update.GetValue()
         one_day = 60 * 60 * 24
         model.ITEM_CACHE_AGE = self.item.GetValue() * one_day
-        model.FEED_CACHE_SIZE = self.feed.GetValue()
         model.USE_PROXY = self.use_proxy.GetValue()
         model.PROXY_URL = self.proxy_url.GetValue()
     def enable_controls(self):

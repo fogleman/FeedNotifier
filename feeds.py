@@ -49,7 +49,6 @@ class Feed(object):
         self.link = ''
         self.clicks = 0
         self.item_count = 0
-        self.id_list = []
         self.id_set = set()
     def make_copy(self):
         feed = Feed(self.url)
@@ -94,14 +93,9 @@ class Feed(object):
         except Exception:
             pass
     def clear_cache(self):
-        self.id_list = []
         self.id_set = set()
         self.etag = None
         self.modified = None
-    def clean_cache(self, size):
-        for id in self.id_list[:-size]:
-            self.id_set.remove(id)
-        self.id_list = self.id_list[-size:]
     def should_poll(self):
         if not self.enabled:
             return False
@@ -122,13 +116,13 @@ class Feed(object):
             self.title = self.title or util.get(feed, 'title', '')
             self.link = self.link or util.get(feed, 'link', self.url)
         entries = util.get(d, 'entries', [])
+        new_id_set = set()
         for entry in reversed(entries):
             id = create_id(entry)
+            new_id_set.add(id)
             if id in self.id_set:
                 continue
             self.item_count += 1
-            self.id_list.append(id)
-            self.id_set.add(id)
             item = Item(self, id)
             item.timestamp = calendar.timegm(util.get(entry, 'date_parsed', time.gmtime()))
             item.title = util.format(util.get(entry, 'title', ''), settings.POPUP_TITLE_LENGTH)
@@ -137,7 +131,7 @@ class Feed(object):
             item.author = util.format(util.get(entry, 'author', '')) # TODO: max length
             if all(filter.filter(item) for filter in filters):
                 result.append(item)
-        self.clean_cache(settings.FEED_CACHE_SIZE)
+        self.id_set = new_id_set or self.id_set
         return result
         
 class Filter(object):

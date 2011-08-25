@@ -212,7 +212,7 @@ class PopupManager(wx.EvtHandler):
     def on_timer(self):
         self.timer = None
         set_timer = False
-        if self.hover_count:
+        if self.hover_count and settings.POPUP_WAIT_ON_HOVER:
             set_timer = True
         elif self.auto:
             if self.index == self.count - 1:
