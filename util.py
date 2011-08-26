@@ -107,11 +107,12 @@ def decode_password(password):
     
 def get_proxy():
     if settings.USE_PROXY:
-        if settings.PROXY_URL:
+        url = decode_password(settings.PROXY_URL)
+        if url:
             # User-configured Proxy
             map = {
-                'http': settings.PROXY_URL,
-                'https': settings.PROXY_URL,
+                'http': url,
+                'https': url,
             }
             proxy = urllib2.ProxyHandler(map)
         else:
