@@ -1,5 +1,6 @@
 import wx
 import wx.lib.wordwrap as wordwrap
+import util
 
 class Event(wx.PyEvent):
     def __init__(self, event_object, type):
@@ -95,6 +96,7 @@ class Link(Text):
         self.Bind(wx.EVT_MOTION, self.on_motion)
         self.Bind(wx.EVT_LEFT_DOWN, self.on_left_down)
         self.Bind(wx.EVT_LEFT_UP, self.on_left_up)
+        self.Bind(wx.EVT_RIGHT_UP, self.on_right_up)
     def hit_test(self, point):
         for rect in self.rects:
             if rect.Contains(point):
@@ -130,10 +132,23 @@ class Link(Text):
             self.trigger = True
     def on_left_up(self, event):
         if self.hover and self.trigger:
-            event = Event(self, EVT_HYPERLINK)
-            event.link = self.link
-            wx.PostEvent(self, event)
+            self.post_event()
         self.trigger = False
+    def on_right_up(self, event):
+        menu = wx.Menu()
+        util.menu_item(menu, 'Open Link', self.on_open_link)
+        util.menu_item(menu, 'Copy Link', self.on_copy_link)
+        self.PopupMenu(menu, event.GetPosition())
+    def on_open_link(self, event):
+        self.post_event()
+    def on_copy_link(self, event):
+        if wx.TheClipboard.Open():
+            wx.TheClipboard.SetData(wx.TextDataObject(self.link))
+            wx.TheClipboard.Close()
+    def post_event(self):
+        event = Event(self, EVT_HYPERLINK)
+        event.link = self.link
+        wx.PostEvent(self, event)
         
 class BitmapLink(wx.PyPanel):
     def __init__(self, parent, link, bitmap, hover_bitmap=None):
