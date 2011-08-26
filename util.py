@@ -103,8 +103,11 @@ def encode_password(password):
     return base64.b64encode(password) if password else None
     
 def decode_password(password):
-    return base64.b64decode(password) if password else None
-    
+    try:
+        return base64.b64decode(password) if password else None
+    except Exception:
+        return None
+        
 def get_proxy():
     if settings.USE_PROXY:
         url = decode_password(settings.PROXY_URL)
