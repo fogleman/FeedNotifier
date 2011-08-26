@@ -1124,21 +1124,27 @@ class PopupsPanel(wx.Panel):
         auto = wx.CheckBox(parent, -1, 'Infinite duration')
         sound = wx.CheckBox(parent, -1, 'Sound notification')
         hover = wx.CheckBox(parent, -1, 'Wait if hovering')
+        top = wx.CheckBox(parent, -1, 'Stay on top')
+
         grid.Add(duration, (0, 1))
         grid.Add(auto, (0, 4), flag=wx.ALIGN_CENTER_VERTICAL)
         grid.Add(sound, (1, 4), flag=wx.ALIGN_CENTER_VERTICAL)
         grid.Add(hover, (0, 6), flag=wx.ALIGN_CENTER_VERTICAL)
+        grid.Add(top, (1, 6), flag=wx.ALIGN_CENTER_VERTICAL)
         
         sizer.Add(grid, 1, wx.EXPAND|wx.ALL, 8)
         
         duration.Bind(wx.EVT_SPINCTRL, self.on_change)
         auto.Bind(wx.EVT_CHECKBOX, self.on_change)
         sound.Bind(wx.EVT_CHECKBOX, self.on_change)
+        hover.Bind(wx.EVT_CHECKBOX, self.on_change)
+        top.Bind(wx.EVT_CHECKBOX, self.on_change)
         
         self.duration = duration
         self.auto = auto
         self.sound = sound
         self.hover = hover
+        self.top = top
         return sizer
     def create_content(self, parent):
         box = wx.StaticBox(parent, -1, 'Content')
@@ -1175,6 +1181,7 @@ class PopupsPanel(wx.Panel):
         self.auto.SetValue(not model.POPUP_AUTO_PLAY)
         self.sound.SetValue(model.PLAY_SOUND)
         self.hover.SetValue(model.POPUP_WAIT_ON_HOVER)
+        self.top.SetValue(model.POPUP_STAY_ON_TOP)
         self.title.SetValue(model.POPUP_TITLE_LENGTH)
         self.body.SetValue(model.POPUP_BODY_LENGTH)
         util.select_choice(self.theme, model.POPUP_THEME)
@@ -1189,6 +1196,7 @@ class PopupsPanel(wx.Panel):
         model.POPUP_BODY_LENGTH = self.body.GetValue()
         model.POPUP_AUTO_PLAY = not self.auto.GetValue()
         model.POPUP_WAIT_ON_HOVER = self.hover.GetValue()
+        model.POPUP_STAY_ON_TOP = self.top.GetValue()
         model.PLAY_SOUND = self.sound.GetValue()
         model.POPUP_THEME = self.theme.GetClientData(self.theme.GetSelection())
         model.POPUP_POSITION = self.position.GetClientData(self.position.GetSelection())

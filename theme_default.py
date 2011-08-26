@@ -9,7 +9,9 @@ BACKGROUND = (230, 230, 230)
 class Frame(wx.Frame):
     def __init__(self, item, context):
         title = settings.APP_NAME
-        style = wx.STAY_ON_TOP | wx.FRAME_NO_TASKBAR | wx.BORDER_NONE
+        style = wx.FRAME_NO_TASKBAR | wx.BORDER_NONE
+        if settings.POPUP_STAY_ON_TOP:
+            style |= wx.STAY_ON_TOP
         super(Frame, self).__init__(None, -1, title, style=style)
         self.item = item
         self.context = context
