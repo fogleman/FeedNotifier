@@ -1363,7 +1363,7 @@ class OptionsPanel(wx.Panel):
         one_day = 60 * 60 * 24
         self.item.SetValue(model.ITEM_CACHE_AGE / one_day)
         self.use_proxy.SetValue(model.USE_PROXY)
-        self.proxy_url.ChangeValue(util.decode_password(model.PROXY_URL))
+        self.proxy_url.ChangeValue(util.decode_password(model.PROXY_URL) or '')
         self.enable_controls()
     def update_model(self):
         model = self.model
