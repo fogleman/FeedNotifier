@@ -1068,14 +1068,11 @@ class PopupsPanel(wx.Panel):
         box = wx.StaticBox(parent, -1, 'Appearance')
         sizer = wx.StaticBoxSizer(box, wx.VERTICAL)
         grid = wx.GridBagSizer(8, 8)
-        labels = ['Theme', 'Width', 'Position', 'Transparency', 'Monitor']
-        positions = [(0, 0), (0, 3), (1, 0), (1, 3), (2, 0)]
+        labels = ['Position', 'Width', 'Monitor', 'Transparency', 'Border', 'Border Size']
+        positions = [(0, 0), (0, 3), (1, 0), (1, 3), (2, 0), (2, 3)]
         for label, position in zip(labels, positions):
             text = wx.StaticText(parent, -1, label)
             grid.Add(text, position, flag=wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT)
-        theme = wx.Choice(parent, -1)
-        for name in util.find_themes():
-            theme.Append(util.pretty_name(name), name)
         position = wx.Choice(parent, -1)
         position.Append('Upper Left', (-1, -1))
         position.Append('Upper Right', (1, -1))
@@ -1087,28 +1084,36 @@ class PopupsPanel(wx.Panel):
         display = wx.Choice(parent, -1)
         for index in range(wx.Display_GetCount()):
             display.Append('Monitor #%d' % (index + 1), index)
-        grid.Add(theme, (0, 1), flag=wx.EXPAND)
-        grid.Add(position, (1, 1), flag=wx.EXPAND)
-        grid.Add(display, (2, 1), flag=wx.EXPAND)
+        border_color = wx.Button(parent, -1)
+        border_size = wx.SpinCtrl(parent, -1, '1', min=1, max=10, size=(64, -1))
+
+        grid.Add(position, (0, 1), flag=wx.EXPAND)
+        grid.Add(display, (1, 1), flag=wx.EXPAND)
         grid.Add(width, (0, 4))
         grid.Add(transparency, (1, 4))
+        grid.Add(border_color, (2, 1), flag=wx.EXPAND)
+        grid.Add(border_size, (2, 4))
         text = wx.StaticText(parent, -1, 'pixels')
         grid.Add(text, (0, 5), flag=wx.ALIGN_CENTER_VERTICAL)
         text = wx.StaticText(parent, -1, '[0-255], 255=opaque')
         grid.Add(text, (1, 5), flag=wx.ALIGN_CENTER_VERTICAL)
+        text = wx.StaticText(parent, -1, 'pixels')
+        grid.Add(text, (2, 5), flag=wx.ALIGN_CENTER_VERTICAL)
         sizer.Add(grid, 1, wx.EXPAND|wx.ALL, 8)
         
-        theme.Bind(wx.EVT_CHOICE, self.on_change)
         position.Bind(wx.EVT_CHOICE, self.on_change)
         display.Bind(wx.EVT_CHOICE, self.on_change)
         width.Bind(wx.EVT_SPINCTRL, self.on_change)
         transparency.Bind(wx.EVT_SPINCTRL, self.on_change)
+        border_size.Bind(wx.EVT_SPINCTRL, self.on_change)
+        border_color.Bind(wx.EVT_BUTTON, self.on_border_color)
         
-        self.theme = theme
         self.position = position
         self.display = display
         self.width = width
         self.transparency = transparency
+        self.border_color = border_color
+        self.border_size = border_size
         return sizer
     def create_behavior(self, parent):
         box = wx.StaticBox(parent, -1, 'Behavior')
@@ -1184,9 +1189,10 @@ class PopupsPanel(wx.Panel):
         self.top.SetValue(model.POPUP_STAY_ON_TOP)
         self.title.SetValue(model.POPUP_TITLE_LENGTH)
         self.body.SetValue(model.POPUP_BODY_LENGTH)
-        util.select_choice(self.theme, model.POPUP_THEME)
         util.select_choice(self.position, model.POPUP_POSITION)
         util.select_choice(self.display, model.POPUP_DISPLAY)
+        self.border_color.SetBackgroundColour(wx.Color(*settings.POPUP_BORDER_COLOR))
+        self.border_size.SetValue(model.POPUP_BORDER_SIZE)
     def update_model(self):
         model = self.model
         model.POPUP_WIDTH = self.width.GetValue()
@@ -1198,9 +1204,18 @@ class PopupsPanel(wx.Panel):
         model.POPUP_WAIT_ON_HOVER = self.hover.GetValue()
         model.POPUP_STAY_ON_TOP = self.top.GetValue()
         model.PLAY_SOUND = self.sound.GetValue()
-        model.POPUP_THEME = self.theme.GetClientData(self.theme.GetSelection())
         model.POPUP_POSITION = self.position.GetClientData(self.position.GetSelection())
         model.POPUP_DISPLAY = self.display.GetClientData(self.display.GetSelection())
+        model.POPUP_BORDER_SIZE = self.border_size.GetValue()
+        color = self.border_color.GetBackgroundColour()
+        model.POPUP_BORDER_COLOR = (color.Red(), color.Green(), color.Blue())
+    def on_border_color(self, event):
+        data = wx.ColourData()
+        data.SetColour(self.border_color.GetBackgroundColour())
+        dialog = wx.ColourDialog(self, data)
+        if dialog.ShowModal() == wx.ID_OK:
+            self.border_color.SetBackgroundColour(dialog.GetColourData().GetColour())
+            self.on_change(event)
     def on_change(self, event):
         self.dialog.on_change()
         event.Skip()

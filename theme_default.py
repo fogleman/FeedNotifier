@@ -72,21 +72,31 @@ class Frame(wx.Frame):
             widget.Bind(wx.EVT_ENTER_WINDOW, self.on_enter)
             widget.Bind(wx.EVT_LEAVE_WINDOW, self.on_leave)
     def create_container(self, parent):
+        color = settings.POPUP_BORDER_COLOR
+
         panel1 = wx.Panel(parent, -1, style=wx.WANTS_CHARS)
-        panel1.SetBackgroundColour(wx.BLACK)
-        panel1.SetForegroundColour(wx.BLACK)
+        panel1.SetBackgroundColour(wx.Color(*color))
+        panel1.SetForegroundColour(wx.Color(*color))
         panel2 = wx.Panel(panel1, -1)
-        panel2.SetBackgroundColour(wx.WHITE)
+        panel2.SetBackgroundColour(wx.BLACK)
         panel2.SetForegroundColour(wx.BLACK)
+        panel3 = wx.Panel(panel2, -1)
+        panel3.SetBackgroundColour(wx.WHITE)
+        panel3.SetForegroundColour(wx.BLACK)
+        contents = self.create_contents(panel3)
+
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(panel2, 1, wx.EXPAND|wx.ALL, 3)
+        sizer.Add(panel2, 1, wx.EXPAND|wx.ALL, max(0, settings.POPUP_BORDER_SIZE - 1))
         panel1.SetSizer(sizer)
-        contents = self.create_contents(panel2)
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(contents, 1, wx.EXPAND|wx.ALL, 1)
+        sizer.Add(panel3, 1, wx.EXPAND|wx.ALL, 1)
         panel2.SetSizer(sizer)
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(contents, 1, wx.EXPAND|wx.ALL)
+        panel3.SetSizer(sizer)
+
         panel1.Fit()
-        self.bind_widgets([panel1, panel2])
+        self.bind_widgets([panel1, panel2, panel3])
         return panel1
     def create_contents(self, parent):
         header = self.create_header(parent)
