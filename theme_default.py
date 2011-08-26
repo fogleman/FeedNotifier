@@ -86,7 +86,7 @@ class Frame(wx.Frame):
         contents = self.create_contents(panel3)
 
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(panel2, 1, wx.EXPAND|wx.ALL, max(0, settings.POPUP_BORDER_SIZE - 1))
+        sizer.Add(panel2, 1, wx.EXPAND|wx.ALL, settings.POPUP_BORDER_SIZE)
         panel1.SetSizer(sizer)
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(panel3, 1, wx.EXPAND|wx.ALL, 1)

@@ -1109,7 +1109,7 @@ class PopupsPanel(wx.Panel):
         for index in range(wx.Display_GetCount()):
             display.Append('Monitor #%d' % (index + 1), index)
         border_color = wx.Button(parent, -1)
-        border_size = wx.SpinCtrl(parent, -1, '1', min=1, max=10, size=(64, -1))
+        border_size = wx.SpinCtrl(parent, -1, '1', min=0, max=9, size=(64, -1))
 
         grid.Add(position, (0, 1), flag=wx.EXPAND)
         grid.Add(display, (1, 1), flag=wx.EXPAND)
