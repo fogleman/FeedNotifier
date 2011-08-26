@@ -49,15 +49,16 @@ class Feed(object):
         self.link = ''
         self.clicks = 0
         self.item_count = 0
+        self.color = None
         self.id_set = set()
     def make_copy(self):
         feed = Feed(self.url)
-        for key in ['uuid', 'enabled', 'interval', 'title', 'link', 'clicks', 'item_count']:
+        for key in ['uuid', 'enabled', 'interval', 'title', 'link', 'clicks', 'item_count', 'color']:
             value = getattr(self, key)
             setattr(feed, key, value)
         return feed
     def copy_from(self, feed):
-        for key in ['enabled', 'interval', 'title', 'link']:
+        for key in ['enabled', 'interval', 'title', 'link', 'color']:
             value = getattr(feed, key)
             setattr(self, key, value)
     @property
@@ -245,6 +246,7 @@ class FeedManager(object):
             'item_count': 0,
             'username': None,
             'password': None,
+            'color': None,
         }
         for feed in self.feeds:
             for name, value in attributes.iteritems():

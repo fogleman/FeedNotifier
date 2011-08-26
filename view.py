@@ -293,8 +293,8 @@ class EditFeedDialog(wx.Dialog):
         return panel
     def create_controls(self, parent):
         sizer = wx.GridBagSizer(8, 8)
-        indexes = [0, 1, 3, 5]
-        labels = ['Feed URL', 'Feed Title', 'Feed Link', 'Polling Interval']
+        indexes = [0, 1, 3, 5, 7]
+        labels = ['Feed URL', 'Feed Title', 'Feed Link', 'Polling Interval', 'Border Color']
         for index, text in zip(indexes, labels):
             label = wx.StaticText(parent, -1, text)
             font = label.GetFont()
@@ -302,7 +302,7 @@ class EditFeedDialog(wx.Dialog):
             label.SetFont(font)
             sizer.Add(label, (index, 0), flag=wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT)
         controls = []
-        for index in indexes[:-1]:
+        for index in indexes[:-2]:
             style = wx.TE_READONLY if index == 0 else 0
             control = wx.TextCtrl(parent, -1, '', size=(300, -1), style=style)
             control.Bind(wx.EVT_TEXT, self.on_text)
@@ -325,6 +325,15 @@ class EditFeedDialog(wx.Dialog):
         self.interval, self.units = interval, units
         sizer.Add(interval, (5, 1))
         sizer.Add(units, (5, 2))
+        self.color = color = wx.Button(parent, -1)
+        color.Bind(wx.EVT_BUTTON, self.on_color)
+        color._color = self.feed.color
+        _color = self.feed.color or settings.POPUP_BORDER_COLOR
+        color.SetBackgroundColour(wx.Color(*_color))
+        sizer.Add(color, (7, 1))
+        self.default = default = wx.Button(parent, -1, 'Use Default')
+        default.Bind(wx.EVT_BUTTON, self.on_default)
+        sizer.Add(default, (7, 2))
         label = wx.StaticText(parent, -1, 'The feed title will be shown in the pop-up window for items from this feed.')
         label.Wrap(300)
         sizer.Add(label, (2, 1), (1, 2), flag=wx.ALIGN_CENTER_VERTICAL)
@@ -334,6 +343,9 @@ class EditFeedDialog(wx.Dialog):
         label = wx.StaticText(parent, -1, 'The polling interval specifies how often the application will check the feed for new items. When adding a new feed, the application automatically fills this in by examining the items in the feed.')
         label.Wrap(300)
         sizer.Add(label, (6, 1), (1, 2), flag=wx.ALIGN_CENTER_VERTICAL)
+        label = wx.StaticText(parent, -1, 'The color specifies the border color of pop-up windows for this feed, if you want to override the default.')
+        label.Wrap(300)
+        sizer.Add(label, (8, 1), (1, 2), flag=wx.ALIGN_CENTER_VERTICAL)
         return sizer
     def create_add_buttons(self, parent):
         sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -369,6 +381,17 @@ class EditFeedDialog(wx.Dialog):
             self.next.Enable()
         else:
             self.next.Disable()
+    def on_color(self, event):
+        data = wx.ColourData()
+        data.SetColour(self.color.GetBackgroundColour())
+        dialog = wx.ColourDialog(self, data)
+        if dialog.ShowModal() == wx.ID_OK:
+            color = dialog.GetColourData().GetColour()
+            self.color.SetBackgroundColour(color)
+            self.color._color = (color.Red(), color.Green(), color.Blue())
+    def on_default(self, event):
+        self.color.SetBackgroundColour(wx.Color(*settings.POPUP_BORDER_COLOR))
+        self.color._color = None
     def on_text(self, event):
         self.validate()
     def on_back(self, event):
@@ -389,6 +412,7 @@ class EditFeedDialog(wx.Dialog):
         self.feed.title = title
         self.feed.link = link
         self.feed.interval = interval
+        self.feed.color = self.color._color
         self.EndModal(wx.ID_OK)
         
 class EditFilterDialog(wx.Dialog):

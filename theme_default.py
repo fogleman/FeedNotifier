@@ -72,7 +72,7 @@ class Frame(wx.Frame):
             widget.Bind(wx.EVT_ENTER_WINDOW, self.on_enter)
             widget.Bind(wx.EVT_LEAVE_WINDOW, self.on_leave)
     def create_container(self, parent):
-        color = settings.POPUP_BORDER_COLOR
+        color = self.item.feed.color or settings.POPUP_BORDER_COLOR
 
         panel1 = wx.Panel(parent, -1, style=wx.WANTS_CHARS)
         panel1.SetBackgroundColour(wx.Color(*color))
