@@ -258,7 +258,7 @@ class FeedManager(object):
             for name, value in attributes.iteritems():
                 if not hasattr(feed, name):
                     setattr(feed, name, value)
-            if not feed.id_list:
+            if not hasattr(feed, 'id_list'):
                 feed.id_list = list(feed.id_set)
         logging.info('Loaded %d feeds, %d items, %d filters' % (len(self.feeds), len(self.items), len(self.filters)))
     def save(self, path='feeds.dat'):
