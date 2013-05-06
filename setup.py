@@ -12,7 +12,7 @@ manifestVersion="1.0">
     name="Feed Notifier"
     type="win32"
   />
-  <description>Feed Notifier 2.5</description>
+  <description>Feed Notifier 2.6</description>
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
     <security>
       <requestedPrivileges>
