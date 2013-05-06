@@ -81,6 +81,16 @@ setup(
         "optimize": 1,
         "bundle_files": 1,
         "includes": ['parsetab'],
+        "dll_excludes": [
+            'msvcp90.dll',
+            'mswsock.dll',
+            'API-MS-Win-Core-LocalRegistry-L1-1-0.dll',
+            'API-MS-Win-Core-ProcessThreads-L1-1-0.dll',
+            'API-MS-Win-Security-Base-L1-1-0.dll',
+            'POWRPROF.dll',
+            'Secur32.dll',
+            'SHFOLDER.dll',
+        ],
     }},
     windows = [{
         "script": "main.py",
