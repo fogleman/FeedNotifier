@@ -63,7 +63,7 @@ def get_data_files():
             return False
         return tuple(file for file in files if not match(file))
     def tree(src):
-        return [(root, map(lambda f: os.path.join(root, f), filter_files(files))) for (root, dirs, files) in os.walk(os.path.normpath(src)) if '.svn' not in root and '.svn' in dirs]
+        return [(root, map(lambda f: os.path.join(root, f), filter_files(files))) for (root, dirs, files) in os.walk(os.path.normpath(src))]
     def include(src):
         result = tree(src)
         result = [('.', item[1]) for item in result]
