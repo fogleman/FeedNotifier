@@ -93,14 +93,9 @@ setup(
 
 # Build Information
 def get_revision():
-    try:
-        import pysvn
-        client = pysvn.Client()
-        entry = client.info('.')
-        return entry.revision.number
-    except Exception:
-        return -1
-        
+    import time
+    return int(time.time())
+    
 def save_build_info():
     revision = get_revision()
     path = 'dist/revision.txt'

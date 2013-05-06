@@ -1400,7 +1400,7 @@ class AboutPanel(wx.Panel):
         sizer.Add(line, 0, wx.EXPAND)
         sizer.Add(panel, 1, wx.EXPAND|wx.ALL, 8)
         credits = '''
-        %s %s :: Build %d :: Copyright (c) 2009-2010, Michael Fogleman
+        %s %s :: Copyright (c) 2009-2013, Michael Fogleman
         
         16x16px icons in this application are from the Silk Icon set provided by Mark James under a Creative Commons Attribution 2.5 License. http://www.famfamfam.com/lab/icons/silk/
         
@@ -1443,7 +1443,7 @@ class AboutPanel(wx.Panel):
         * Neither the name of the David Beazley or Dabeaz LLC may be used to endorse or promote products derived from this software without specific prior written permission.
         
         THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-        ''' % (settings.APP_NAME, settings.APP_VERSION, settings.LOCAL_REVISION)
+        ''' % (settings.APP_NAME, settings.APP_VERSION)
         credits = '\n'.join(line.strip() for line in credits.strip().split('\n'))
         text = wx.TextCtrl(self, -1, credits, style=wx.TE_MULTILINE|wx.TE_READONLY)
         text.SetBackgroundColour(self.GetBackgroundColour())
