@@ -75,8 +75,8 @@ class Frame(wx.Frame):
         color = self.item.feed.color or settings.POPUP_BORDER_COLOR
 
         panel1 = wx.Panel(parent, -1, style=wx.WANTS_CHARS)
-        panel1.SetBackgroundColour(wx.Color(*color))
-        panel1.SetForegroundColour(wx.Color(*color))
+        panel1.SetBackgroundColour(wx.Colour(*color))
+        panel1.SetForegroundColour(wx.Colour(*color))
         panel2 = wx.Panel(panel1, -1)
         panel2.SetBackgroundColour(wx.BLACK)
         panel2.SetForegroundColour(wx.BLACK)

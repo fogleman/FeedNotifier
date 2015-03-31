@@ -329,7 +329,7 @@ class EditFeedDialog(wx.Dialog):
         color.Bind(wx.EVT_BUTTON, self.on_color)
         color._color = self.feed.color
         _color = self.feed.color or settings.POPUP_BORDER_COLOR
-        color.SetBackgroundColour(wx.Color(*_color))
+        color.SetBackgroundColour(wx.Colour(*_color))
         sizer.Add(color, (7, 1))
         self.default = default = wx.Button(parent, -1, 'Use Default')
         default.Bind(wx.EVT_BUTTON, self.on_default)
@@ -390,7 +390,7 @@ class EditFeedDialog(wx.Dialog):
             self.color.SetBackgroundColour(color)
             self.color._color = (color.Red(), color.Green(), color.Blue())
     def on_default(self, event):
-        self.color.SetBackgroundColour(wx.Color(*settings.POPUP_BORDER_COLOR))
+        self.color.SetBackgroundColour(wx.Colour(*settings.POPUP_BORDER_COLOR))
         self.color._color = None
     def on_text(self, event):
         self.validate()
@@ -1215,7 +1215,7 @@ class PopupsPanel(wx.Panel):
         self.body.SetValue(model.POPUP_BODY_LENGTH)
         util.select_choice(self.position, model.POPUP_POSITION)
         util.select_choice(self.display, model.POPUP_DISPLAY)
-        self.border_color.SetBackgroundColour(wx.Color(*settings.POPUP_BORDER_COLOR))
+        self.border_color.SetBackgroundColour(wx.Colour(*settings.POPUP_BORDER_COLOR))
         self.border_size.SetValue(model.POPUP_BORDER_SIZE)
     def update_model(self):
         model = self.model
